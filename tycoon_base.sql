@@ -71265,11 +71265,21 @@ INSERT INTO `country` (`iso_country`, `name`, `continent`, `wikipedia_link`, `ke
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
 
 
-
+delete from airport
+where scheduled_service = "no";
+delete from airport
+where type = "heliport";
+delete from airport
+where type = "closed";
+delete from airport
+where type = "seaplane_base";
+delete from airport
+where type = "balloonport";
 alter table airport
 drop column local_code,
 drop column home_link,
 drop column wikipedia_link,
+drop column scheduled_service
 add constraint iso_country
 foreign key (iso_country) references country(iso_country)
 ;
@@ -71281,13 +71291,18 @@ id int not null auto_increment,
 yield int,
 primary key (id)
 );
+alter table Airport
+add constraint player_airports_id
+foreign key (player_airports_id)
+references player_airports(id)
+;
 create table other_airports(
 id int not null auto_increment,
 yield int,
 primary key (id)
 );
 create table runway_types(
-id int not null auto_increment,
+id int,
 length int,
 cost int,
 construction_time int,
@@ -71296,8 +71311,8 @@ yield int,
 primary key (id)
 );
 create table terminal_types(
-id int not null auto_increment,
-size int,
+id int,
+size varchar(40),
 cost int,
 construction_time int,
 operating_cost int,
@@ -71347,3 +71362,19 @@ create table event_types(
 id int primary key,
 description varchar(100)
 );
+insert into game(money)
+values(10000000);
+insert into game(time)
+values(0);
+insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
+values (0, 1500, 3000000, 12, 20000, 60000);
+insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
+values (1, 3000, 6000000, 24, 40000, 120000);
+insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
+values (2, 4500, 9000000, 36, 60000, 180000);
+insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
+values (0, small, 3000000, 12, 20000, 60000);
+insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
+values (1, medium, 6000000, 24, 40000, 120000);
+insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
+values (2, large, 12000000, 48, 80000, 240000);
