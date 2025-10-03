@@ -13,11 +13,11 @@ Sisältö:
 import mysql.connector
 
 connect = mysql.connector.connect(
-         host='127.0.0.1',
+         host='localhost',
          port= 3306,
          database='flight_game',
-         user='user',
-         password='password',
+         user='flight_game_user',
+         password='1234',
          autocommit=True
          )
 
@@ -33,5 +33,6 @@ money = 10000000
 time = 0
 player = input("Syötä pelaajan nimi: ")
 create_game(money, time, player)
+
 
 
