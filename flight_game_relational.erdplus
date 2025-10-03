@@ -93,14 +93,6 @@
               "isUnique": false
             },
             {
-              "id": "bdebac35-9d7a-40c0-b800-05343f8f9429",
-              "name": "scheduled_service",
-              "type": "VARCHAR(n)",
-              "position": 10,
-              "isPrimaryKey": false,
-              "isUnique": false
-            },
-            {
               "id": "4823d2b3-ea44-44cb-b1ca-d7c8dff1356e",
               "name": "gps_code",
               "type": "VARCHAR(n)",
@@ -165,7 +157,7 @@
         },
         "measured": {
           "width": 240,
-          "height": 429
+          "height": 404
         },
         "selected": false,
         "dragging": false
@@ -326,7 +318,7 @@
                 "columns": [
                   {
                     "id": "fk_173397c7-e1fb-420f-809d-3371f3e64664",
-                    "name": "player_airports_id",
+                    "name": "other_airports_id",
                     "type": "INT"
                   }
                 ]
@@ -573,7 +565,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             },
             {
               "id": "fk_edb886af-3819-4f1c-a6b6-400a871e986d",
@@ -590,7 +584,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             }
           ],
           "numberOfGroups": 0,
@@ -599,7 +595,7 @@
         },
         "measured": {
           "width": 240,
-          "height": 78
+          "height": 79
         },
         "selected": false,
         "dragging": false
@@ -630,7 +626,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             },
             {
               "id": "fk_0357048c-b06b-4938-b0e9-3fa0611f4c8d",
@@ -647,7 +645,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             }
           ],
           "numberOfGroups": 0,
@@ -655,7 +655,7 @@
         },
         "measured": {
           "width": 240,
-          "height": 78
+          "height": 79
         },
         "selected": false,
         "dragging": false
@@ -686,7 +686,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             },
             {
               "id": "fk_78bb8b0f-4f4e-4447-b74d-7ef65390c810",
@@ -703,7 +705,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             }
           ],
           "numberOfGroups": 0,
@@ -711,7 +715,7 @@
         },
         "measured": {
           "width": 240,
-          "height": 78
+          "height": 79
         },
         "selected": false,
         "dragging": false
@@ -742,7 +746,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             },
             {
               "id": "fk_04889651-1ada-42e8-8893-b71925bc30fc",
@@ -759,7 +765,9 @@
                     "type": "INT"
                   }
                 ]
-              }
+              },
+              "isPrimaryKey": true,
+              "isOptional": false
             }
           ],
           "numberOfGroups": 0,
@@ -767,7 +775,7 @@
         },
         "measured": {
           "width": 240,
-          "height": 78
+          "height": 79
         },
         "selected": false,
         "dragging": false
@@ -1052,9 +1060,9 @@
       }
     ],
     "viewport": {
-      "x": 238.53852923877548,
-      "y": 856.2543078520304,
-      "zoom": 0.9460576467255961
+      "x": 380.31433342874413,
+      "y": 867.319236039874,
+      "zoom": 0.7889439819684415
     }
   },
   "name": "lentopeli_relation",
@@ -1065,5 +1073,5 @@
     "id": 43370
   },
   "id": 79365,
-  "updatedAtTimestamp": 1759431513
+  "updatedAtTimestamp": 1759509311
 }
