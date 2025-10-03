@@ -31,8 +31,9 @@ def create_game(g_money,g_time,g_name):
 # 4. Pelin asetukset
 money = 10000000
 time = 0
-player = input("Syötä pelaajan nimi: ")
+player = input("Enter your name: ")
 create_game(money, time, player)
+
 
 
 
