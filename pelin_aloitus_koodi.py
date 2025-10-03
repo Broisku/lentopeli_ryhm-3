@@ -15,7 +15,7 @@ import mysql.connector
 connect = mysql.connector.connect(
          host='127.0.0.1',
          port= 3306,
-         database='tycoon',
+         database='flight_game',
          user='user',
          password='password',
          autocommit=True
@@ -33,4 +33,5 @@ money = 10000000
 time = 0
 player = input("Syötä pelaajan nimi: ")
 create_game(money, time, player)
+
 
