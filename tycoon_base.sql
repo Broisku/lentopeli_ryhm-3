@@ -71279,8 +71279,8 @@ alter table airport
 drop column local_code,
 drop column home_link,
 drop column wikipedia_link,
-drop column scheduled_service
-add constraint iso_country
+drop column scheduled_service,
+add constraint fk_airport_country
 foreign key (iso_country) references country(iso_country)
 ;
 alter table country
@@ -71291,8 +71291,9 @@ id int not null auto_increment,
 yield int,
 primary key (id)
 );
-alter table Airport
-add constraint player_airports_id
+alter table airport
+add column player_airports_id int,
+add constraint airport_player_airports
 foreign key (player_airports_id)
 references player_airports(id)
 ;
@@ -71373,8 +71374,11 @@ values (1, 3000, 6000000, 24, 40000, 120000);
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
 values (2, 4500, 9000000, 36, 60000, 180000);
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
-values (0, small, 3000000, 12, 20000, 60000);
+values (0, "small", 3000000, 12, 20000, 60000);
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
-values (1, medium, 6000000, 24, 40000, 120000);
+values (1, "medium", 6000000, 24, 40000, 120000);
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
-values (2, large, 12000000, 48, 80000, 240000);
+values (2, "large", 12000000, 48, 80000, 240000);
+create user "flight_game_user"@"localhost" IDENTIFIED by "1234";
+grant select, insert, update, delete on flight_game.* to "flight_game_user"@"localhost";
+flush privileges;
