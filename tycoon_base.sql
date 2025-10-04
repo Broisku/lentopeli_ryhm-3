@@ -71375,6 +71375,6 @@ insert into terminal_types(id, size, cost, construction_time, operating_cost, yi
 values (1, "medium", 6000000, 24, 40000, 120000);
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
 values (2, "large", 12000000, 48, 80000, 240000);
-create user "flight_game_user"@"localhost" IDENTIFIED by "1234";
+create user if not exists "flight_game_user"@"localhost" IDENTIFIED by "1234";
 grant select, insert, update, delete on flight_game.* to "flight_game_user"@"localhost";
 flush privileges;
