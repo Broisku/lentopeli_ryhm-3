@@ -12,6 +12,9 @@ Sisältö:
 
 import mysql.connector
 
+from functions.buy_airport import buy_airport
+from functions.show_airports import show_airports
+
 connect = mysql.connector.connect(
          host='localhost',
          port= 3306,
@@ -28,12 +31,16 @@ def create_game(g_money,g_time,g_name):
     cursor = connect.cursor()
     cursor.execute(sql, (g_money,g_time,g_name))
 
-def give_bank_balance():
-    sql = "SELECT MONEY FROM GAME"
-    cursor = connect.cursor()
-    cursor.execute(sql)
+def give_bank_balance(connect, player):
+    sql = "SELECT MONEY FROM GAME where name = %s"
+    cursor = connect.cursor(buffered=True)
+    cursor.execute(sql, (player,))
     balance = cursor.fetchone()
-    return balance
+    cursor.close()
+    return balance[0]
+
+#funktioita voi kait kutsua muistakin tiedostoista jotka on samassa repossa niin ei tarvi olla kaikki funktiot tässä samassa
+
 
 # 4. Pelin asetukset
 money = 10000000
@@ -41,6 +48,16 @@ time = 0
 player = input("Enter your name: ")
 create_game(money, time, player)
 
-
-
-
+while True:
+    print(f"Week {time}")
+    player_input = input("possible commands: next week, view money, view airports, buy airports")
+    if player_input == "view airports":
+        show_airports(connect)
+    elif player_input == "buy airports":
+        icao = input("Enter icao code of the airport you wish to purchase: ")
+        buy_airport(icao, connect, player)
+    elif player_input == "view money":
+        balance = give_bank_balance(connect, player)
+        print(f"Your balance is: {balance:,}")
+    elif player_input == "next week":
+        time = time + 1
