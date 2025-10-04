@@ -28,6 +28,13 @@ def create_game(g_money,g_time,g_name):
     cursor = connect.cursor()
     cursor.execute(sql, (g_money,g_time,g_name))
 
+def give_bank_balance():
+    sql = "SELECT MONEY FROM GAME"
+    cursor = connect.cursor()
+    cursor.execute(sql)
+    balance = cursor.fetchone()
+    return balance
+
 # 4. Pelin asetukset
 money = 10000000
 time = 0
