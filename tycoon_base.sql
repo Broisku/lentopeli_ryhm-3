@@ -71350,8 +71350,8 @@ foreign key (terminal_types_id) references terminal_types(id)
 );
 create table game(
 id int not null auto_increment,
-money int,
-time int,
+money int not null,
+time int not null,
 name varchar(40),
 player_airports_id int,
 other_airports_id int,
@@ -71363,10 +71363,6 @@ create table event_types(
 id int primary key,
 description varchar(100)
 );
-insert into game(money)
-values(10000000);
-insert into game(time)
-values(0);
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
 values (0, 1500, 3000000, 12, 20000, 60000);
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
