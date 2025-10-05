@@ -16,6 +16,7 @@ from functions.buy_airport import buy_airport
 from functions.check_username import check_username
 from functions.show_airports import show_airports
 from functions.check_time import check_time
+from functions.view_own_airports import view_own_airports
 
 connect = mysql.connector.connect(
          host='localhost',
@@ -60,7 +61,7 @@ else:
 
 while True:
     print(f"Week {check_time(connect, player)}")
-    player_input = input("Enter your command or type commands to view possible commands")
+    player_input = input("Enter your command or type commands to view available commands ")
     if player_input == "view airports":
         show_airports(connect)
     elif player_input == "buy airports":
@@ -75,4 +76,14 @@ while True:
         cursor.execute("update game set time = %s where name = %s ", (time, player))
         cursor.close()
     elif player_input == "commands":
-        print("Possible commands: next week, view money, view airports, buy airports")
+        available_commands = ["exit game", "next week", "view money", "view airports", "view my airports", "buy airports"]
+        print("Available commands:")
+        for command in available_commands:
+            print(command)
+    elif player_input == "exit game":
+        connect.close()
+        break
+    elif player_input == "view my airports":
+        print("Your airports:")
+        print("HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
+        print(view_own_airports(connect, player))
