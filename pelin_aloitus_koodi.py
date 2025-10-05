@@ -13,7 +13,9 @@ Sisältö:
 import mysql.connector
 
 from functions.buy_airport import buy_airport
+from functions.check_username import check_username
 from functions.show_airports import show_airports
+from functions.check_time import check_time
 
 connect = mysql.connector.connect(
          host='localhost',
@@ -43,14 +45,22 @@ def give_bank_balance(connect, player):
 
 
 # 4. Pelin asetukset
-money = 10000000
-time = 0
+
+
 player = input("Enter your name: ")
-create_game(money, time, player)
+if check_username(connect, player) == False:
+    money = 10000000
+    time = 0
+    create_game(money, time, player)
+    print("New game created")
+else:
+    print("Welcome back " + player + "!")
+    time = check_time(connect, player)
+
 
 while True:
-    print(f"Week {time}")
-    player_input = input("possible commands: next week, view money, view airports, buy airports")
+    print(f"Week {check_time(connect, player)}")
+    player_input = input("Enter your command or type commands to view possible commands")
     if player_input == "view airports":
         show_airports(connect)
     elif player_input == "buy airports":
@@ -61,3 +71,8 @@ while True:
         print(f"Your balance is: {balance:,}")
     elif player_input == "next week":
         time = time + 1
+        cursor = connect.cursor(buffered=True)
+        cursor.execute("update game set time = %s where name = %s ", (time, player))
+        cursor.close()
+    elif player_input == "commands":
+        print("Possible commands: next week, view money, view airports, buy airports")
