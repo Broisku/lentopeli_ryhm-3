@@ -17,6 +17,9 @@ from functions.check_username import check_username
 from functions.show_airports import show_airports
 from functions.check_time import check_time
 from functions.view_own_airports import view_own_airports
+from functions.view_runways import view_runway
+from functions.buy_runway import buy_runway
+from functions.get_bank_balance import give_bank_balance
 
 connect = mysql.connector.connect(
          host='localhost',
@@ -32,15 +35,9 @@ connect = mysql.connector.connect(
 def create_game(g_money,g_time,g_name):
     sql = "INSERT INTO game (money,time,name) VALUES (%s,%s,%s)"
     cursor = connect.cursor()
-    cursor.execute(sql, (g_money,g_time,g_name))
+    cursor.execute(sql, (g_money,g_time,g_name,))
 
-def give_bank_balance(connect, player):
-    sql = "SELECT MONEY FROM GAME where name = %s"
-    cursor = connect.cursor(buffered=True)
-    cursor.execute(sql, (player,))
-    balance = cursor.fetchone()
-    cursor.close()
-    return balance[0]
+
 
 #funktioita voi kait kutsua muistakin tiedostoista jotka on samassa repossa niin ei tarvi olla kaikki funktiot tässä samassa
 
@@ -65,8 +62,11 @@ while True:
     if player_input == "view airports":
         show_airports(connect)
     elif player_input == "buy airports":
-        icao = input("Enter icao code of the airport you wish to purchase: ")
-        buy_airport(icao, connect, player)
+        icao = input("Enter icao code of the airport you wish to purchase or type exit: ")
+        if icao == "exit":
+            continue
+        else:
+            buy_airport(icao, connect, player)
     elif player_input == "view money":
         balance = give_bank_balance(connect, player)
         print(f"Your balance is: {balance:,}")
@@ -87,3 +87,13 @@ while True:
         print("Your airports:")
         print("HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
         print(view_own_airports(connect, player))
+        player_input = input("type upgrades to view available upgrades or type exit")
+        if player_input == "exit":
+            continue
+        elif player_input == "upgrades":
+            runway_terminal = input("type runways to view available runways or type terminals to view available terminals or type exit")
+            if runway_terminal == "exit":
+                continue
+            elif runway_terminal == "runways":
+                icao = input("Enter icao of your airport")
+                view_runway(connect, player, icao)
