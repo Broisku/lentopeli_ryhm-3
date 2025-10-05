@@ -1,5 +1,7 @@
 flight_game on tycoon tyyppinen peli, jossa pelaaja voi ostaa, hallita sekä laajentaa lentokenttiä. Pelialueena toimii koko maailma.
 
+Link to docs: https://docs.google.com/document/d/1aKimyoUgxhR9TuIQnhn2PMnNXQFy1S0_VO-FlOQaC70/edit?tab=t.0
+
 ## Database Installation:
 
 open mariadb as root user
