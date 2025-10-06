@@ -19,7 +19,7 @@ def view_runway(connect, player, icao):
         large_stats = cursor.fetchall()
         print(large_stats)
 
-    print("HOW TO READ: (length in meters, cost, construction time, operating cost, yield")
+    print("HOW TO READ: (length in meters, cost, construction time, operating cost, yield)")
     cursor.execute("""
                     select type from airport join player_airports
                     on airport.player_airports_id = player_airports.id join game
@@ -50,9 +50,11 @@ def view_runway(connect, player, icao):
             print("Runways available for small airport: 2 x 1500m runway")
         elif len(result_runway_count) < 2:
             print("Runways available: 1 x 1500m runway")
-        else: print("No runways available")
+        else:
+            print("No runways available")
+            return
         print("cost for runway: 3,000,000")
-        player_action = input("type buy to buy runway or type exit")
+        player_action = input("type buy to buy runway or type exit ")
         if player_action == "buy":
             buy_runway(connect, player, icao)
         elif player_action == "exit":
@@ -65,9 +67,11 @@ def view_runway(connect, player, icao):
             print("Runways available: 2 x 3000m runway")
         elif len(result_runway_count) < 3:
             print("Runways available: 1 x 3000m runway")
-        else: print("No runways available")
+        else:
+            print("No runways available")
+            return
         print("cost for runway: 6,000,000")
-        player_action = input("type buy to buy runway or type exit")
+        player_action = input("type buy to buy runway or type exit ")
         if player_action == "buy":
             buy_runway(connect, player, icao)
         elif player_action == "exit":
@@ -83,9 +87,11 @@ def view_runway(connect, player, icao):
             print("Runways available: 2 x 4500m runway")
         elif len(result_runway_count) < 4:
             print("Runways available: 1 x 4500m runway")
-        else: print("No runways available")
+        else:
+            print("No runways available")
+            return
         print("cost for runway: 9,000,000")
-        player_action = input("type buy to buy runway or type exit")
+        player_action = input("type buy to buy runway or type exit ")
         if player_action == "buy":
             buy_runway(connect, player, icao)
         elif player_action == "exit":
