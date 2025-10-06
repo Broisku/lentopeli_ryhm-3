@@ -65,7 +65,7 @@ def view_terminal(connect, player, icao):
         elif len(result_terminal_count) < 2:
             print("Terminals available for large airport: 2 large terminals")
         elif len(result_terminal_count) < 3:
-            print("Terminals available for large airport: 3 large terminals")
+            print("Terminals available for large airport: 1 large terminal")
         else:
             print("No terminals available")
         print("cost for terminal: 12,000,000")
@@ -76,4 +76,5 @@ def view_terminal(connect, player, icao):
     elif player_action == "exit":
         cursor.close()
         return
+
     cursor.close()
