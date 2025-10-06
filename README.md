@@ -2,6 +2,18 @@ flight_game on tycoon tyyppinen peli, jossa pelaaja voi ostaa, hallita sekä laa
 
 Link to docs: https://docs.google.com/document/d/1aKimyoUgxhR9TuIQnhn2PMnNXQFy1S0_VO-FlOQaC70/edit?tab=t.0
 
+## TODO:
+
+-when going to "view my airports" it should show the yield of your airports
+
+-add operating cost and yield of bought runway affect players money
+
+-add total money spent to operating cost, and the total yield of your airports, and the total profit when selecting "view money"
+
+-add option to buy terminals
+
+-if player does not have any airports yet return to commands and print "you dont have airports yet"
+
 ## Database Installation:
 
 open mariadb as root user
