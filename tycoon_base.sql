@@ -71321,9 +71321,9 @@ yield int,
 primary key (id)
 );
 create table player_runway(
+id int auto_increment primary key,
 player_airports_id int,
 runway_types_id int,
-primary key (player_airports_id, runway_types_id),
 foreign key (player_airports_id) references player_airports(id),
 foreign key (runway_types_id) references runway_types(id)
 );
@@ -71335,9 +71335,9 @@ foreign key (other_airports_id) references other_airports(id),
 foreign key (runway_types_id) references runway_types(id)
 );
 create table player_terminal(
+id int auto_increment primary key,
 player_airports_id int,
 terminal_types_id int,
-primary key (player_airports_id, terminal_types_id),
 foreign key (player_airports_id) references player_airports(id),
 foreign key (terminal_types_id) references terminal_types(id)
 );
