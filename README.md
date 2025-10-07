@@ -10,9 +10,9 @@ Link to docs: https://docs.google.com/document/d/1aKimyoUgxhR9TuIQnhn2PMnNXQFy1S
 
 -add total money spent to operating cost, and the total yield of your airports, and the total profit when selecting "view money"
 
--add option to buy terminals
+- TEHTY: add option to buy terminals
 
--if player does not have any airports yet return to commands and print "you dont have airports yet"
+- TEHTY: if player does not have any airports yet return to commands and print "you dont have airports yet"
 
 ## Database Installation:
 
