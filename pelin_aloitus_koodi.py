@@ -1,14 +1,12 @@
 """
 Sisältö:
 1. Tietokantayhteys
-2. Funktiot
-3. Pelin aloitus (esim. säännöt)
-4. Pelin asetukset (tallennetaan tiedot, esim. aloitusraha, aika, pelaajan nimi yms)
-5. Peli-loop
-6. Pelin lopetus, kun loop keskeytetään
+2. Pelin aloitus
+3. Peli-loop
+4. Pelin lopetus
 """
 
-# 1. Tietokantayhteys
+
 
 import mysql.connector
 
@@ -18,7 +16,6 @@ from functions.show_airports import show_airports
 from functions.check_time import check_time
 from functions.view_own_airports import view_own_airports
 from functions.view_runways import view_runway
-from functions.buy_runway import buy_runway
 from functions.view_terminals import view_terminal
 from functions.get_bank_balance import give_bank_balance
 
@@ -31,19 +28,12 @@ connect = mysql.connector.connect(
          autocommit=True
          )
 
-# 2. Funktiot
 
 def create_game(g_money,g_time,g_name):
     sql = "INSERT INTO game (money,time,name) VALUES (%s,%s,%s)"
     cursor = connect.cursor()
     cursor.execute(sql, (g_money,g_time,g_name,))
 
-
-
-#funktioita voi kait kutsua muistakin tiedostoista jotka on samassa repossa niin ei tarvi olla kaikki funktiot tässä samassa
-
-
-# 4. Pelin asetukset
 
 
 player = input("Enter your name: ")
@@ -85,19 +75,26 @@ while True:
         connect.close()
         break
     elif player_input == "view my airports":
-        print("Your airports:")
-        print("HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
-        print(view_own_airports(connect, player))
-        player_input = input("type upgrades to view available upgrades or type exit ")
-        if player_input == "exit":
-            continue
-        elif player_input == "upgrades":
-            runway_terminal = input("type runways to view available runways or type terminals to view available terminals or type exit ")
-            if runway_terminal == "exit":
+        own_airports = view_own_airports(connect, player)
+        if not own_airports:
+            print("You dont have airports yet")
+        else:
+            print("Your airports:")
+            print(
+                "HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
+            for airport in own_airports:
+                print(airport)
+            player_input = input("type upgrades to view available upgrades or type exit ")
+            if player_input == "exit":
                 continue
-            elif runway_terminal == "runways":
-                icao = input("Enter icao of your airport ")
-                view_runway(connect, player, icao)
-            elif runway_terminal == "terminals":
-                icao = input("Enter icao of your airport ")
-                view_terminal(connect, player, icao)
+            elif player_input == "upgrades":
+                runway_terminal = input(
+                    "type runways to view available runways or type terminals to view available terminals or type exit ")
+                if runway_terminal == "exit":
+                    continue
+                elif runway_terminal == "runways":
+                    icao = input("Enter icao of your airport ")
+                    view_runway(connect, player, icao)
+                elif runway_terminal == "terminals":
+                    icao = input("Enter icao of your airport ")
+                    view_terminal(connect, player, icao)
