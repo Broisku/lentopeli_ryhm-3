@@ -1,6 +1,12 @@
 from functions.fetch_airport_cost import get_airport_cost
+from functions.check_availability import check_availability
 
 def buy_airport(icao, connect, player):
+    #tarkistetaan ensin onko lentokenttä saatavilla
+    if check_availability(connect, icao):
+        print("Airport is not available for purchase")
+        return
+
     cursor = connect.cursor(buffered=True)
     cursor.execute("select money from game where name = %s", (player,))
     result = cursor.fetchone()
