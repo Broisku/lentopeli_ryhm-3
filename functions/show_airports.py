@@ -6,7 +6,7 @@ def show_airports(connect):
     where country.iso_country = %s
     order by type desc
     """
-    country_iso = input("Enter the country ICAO code (in CAPS):")
+    country_iso = input("Enter the ISO country code (in CAPS): ")
     cursor = connect.cursor()
     cursor.execute(sql, (country_iso,))
     airports = cursor.fetchall()
