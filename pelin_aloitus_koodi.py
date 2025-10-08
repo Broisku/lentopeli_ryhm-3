@@ -18,6 +18,8 @@ from functions.view_own_airports import view_own_airports
 from functions.view_runways import view_runway
 from functions.view_terminals import view_terminal
 from functions.get_bank_balance import give_bank_balance
+from functions.add_yield import add_yield
+from functions.constructions import constructions
 
 connect = mysql.connector.connect(
          host='localhost',
@@ -66,6 +68,8 @@ while True:
         cursor = connect.cursor(buffered=True)
         cursor.execute("update game set time = %s where name = %s ", (time, player))
         cursor.close()
+        constructions(connect)
+        add_yield(connect, player)
     elif player_input == "commands":
         available_commands = ["exit game", "next week", "view money", "view airports", "view my airports", "buy airports"]
         print("Available commands:")
