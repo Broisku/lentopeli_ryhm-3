@@ -10,7 +10,7 @@ def buy_terminal(connect, player, icao):
         terminal_id = 0
     elif airport_type == "medium_airport":
         terminal_id = 1
-    elif airport_type == "large_airport":
+    else:
         terminal_id = 2
 
     cursor = connect.cursor(dictionary=True)
