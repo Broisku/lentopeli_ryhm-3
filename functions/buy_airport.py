@@ -17,7 +17,7 @@ def buy_airport(icao, connect, player):
 
     if money >= airport_cost:
         cursor.execute("update game set money = money - %s where name = %s", (airport_cost, player,))
-        add_airport = "insert into player_airports() values()"
+        add_airport = "insert into player_airports(yield) values(0)"
         cursor.execute(add_airport)
         player_airport_id = cursor.lastrowid
         cursor.execute("update airport set player_airports_id = %s where gps_code = %s", (player_airport_id, icao,))
