@@ -71324,6 +71324,8 @@ create table player_runway(
 id int auto_increment primary key,
 player_airports_id int,
 runway_types_id int,
+construction_weeks_left int,
+status enum('under_construction', 'operational') default 'under_construction',
 foreign key (player_airports_id) references player_airports(id),
 foreign key (runway_types_id) references runway_types(id)
 );
@@ -71338,6 +71340,8 @@ create table player_terminal(
 id int auto_increment primary key,
 player_airports_id int,
 terminal_types_id int,
+construction_weeks_left int,
+status enum('under_construction', 'operational') default 'under_construction',
 foreign key (player_airports_id) references player_airports(id),
 foreign key (terminal_types_id) references terminal_types(id)
 );
