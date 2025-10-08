@@ -16,17 +16,16 @@ def buy_terminal(connect, player, icao):
     cursor = connect.cursor(dictionary=True)
     cursor.execute("select size, cost, construction_time, operating_cost, yield from terminal_types where id=%s",
                    (terminal_id,))
-    terminal = cursor.fetchone() #terminaalin tiedot sanakirjana, sarakkeiden nimet ovat sanakirjan avaimia
+    terminal = cursor.fetchone() #terminaalin tiedot sanakirjana, sarakkeen nimet ovat sanakirjan avaimia
 
     if balance < terminal["cost"]:
         print("You don't have enough money!")
         return
-
     airport_id = get_airport_id(connect, player, icao)
     cursor.execute("""
-                   insert into player_terminal (player_airports_id, terminal_types_id)
-                   values (%s, %s)
-                   """, (airport_id, terminal_id))
+                   insert into player_terminal (player_airports_id, terminal_types_id, construction_weeks_left)
+                   values (%s, %s, %s)
+                   """, (airport_id, terminal_id, terminal["construction_time"]))
     cursor.execute("update game set money = money - %s where name = %s", (terminal["cost"], player,))
     print("Terminal purchase successful!")
     cursor.close()
