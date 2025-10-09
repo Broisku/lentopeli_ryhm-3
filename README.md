@@ -6,7 +6,7 @@ Link to docs: https://docs.google.com/document/d/1aKimyoUgxhR9TuIQnhn2PMnNXQFy1S
 
 ## TODO:
 
-- TEHTY when going to "view my airports" it should show the yield of your airports
+- fix get player yield
 
 - TEHTY: add operating cost and yield of bought runway affect players money
 
