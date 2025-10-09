@@ -5,3 +5,5 @@ def give_bank_balance(connect, player):
     balance = cursor.fetchone()
     cursor.close()
     return balance[0]
+
+
