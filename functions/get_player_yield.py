@@ -6,7 +6,7 @@ def get_player_yield(connect, player):
     WHERE game.name = %s"""
     cursor = connect.cursor(buffered=True)
     cursor.execute(sql_terminal_yield, (player,))
-    terminal_yield = cursor.fetchone()
+    terminal_yield = cursor.fetchone()[0]
 
     sql_runway_yield = """SELECT SUM(runway_types.yield)  FROM runway_types
     INNER JOIN player_runway ON player_runway.runway_types_id = runway_types.id
@@ -14,8 +14,10 @@ def get_player_yield(connect, player):
     INNER JOIN game ON game.player_airports_id = player_airports.id
     WHERE game.name = %s"""
     cursor.execute(sql_runway_yield, (player,))
-    runway_yield = cursor.fetchone()
-    print('runway_yield', runway_yield, type(runway_yield))
+    runway_yield = cursor.fetchone()[0]
+
+    terminal_yield = terminal_yield or 0
+    runway_yield = runway_yield or 0
     total_yield = runway_yield + terminal_yield
     cursor.close()
     return total_yield
