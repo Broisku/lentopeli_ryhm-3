@@ -47,7 +47,9 @@ def view_terminal(connect, player, icao):
     if airport_type == "small_airport":
         if len(result_terminal_count) < 1:
             print("Terminals available for small airport: 1 small terminal")
-        else: print("No terminals available")
+        else:
+            print("No terminals available")
+            return
         print("cost for terminal: 3,000,000")
 
     if airport_type == "medium_airport":
@@ -57,6 +59,7 @@ def view_terminal(connect, player, icao):
             print("Terminals available for medium airport: 1 medium terminal")
         else:
             print("No terminals available")
+            return
         print("cost for terminal: 6,000,000")
 
     if airport_type == "large_airport":
@@ -68,6 +71,7 @@ def view_terminal(connect, player, icao):
             print("Terminals available for large airport: 1 large terminal")
         else:
             print("No terminals available")
+            return
         print("cost for terminal: 12,000,000")
 
     player_action = input("type buy to buy terminal or type exit ")
