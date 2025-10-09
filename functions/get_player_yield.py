@@ -15,7 +15,7 @@ def get_player_yield(connect, player):
     WHERE game.name = %s"""
     cursor.execute(sql_runway_yield, (player,))
     runway_yield = cursor.fetchone()
-
+    print('runway_yield', runway_yield, type(runway_yield))
     total_yield = runway_yield + terminal_yield
     cursor.close()
     return total_yield
