@@ -17,5 +17,5 @@ def get_player_yield(connect, player):
     runway_yield = cursor.fetchone()
 
     total_yield = runway_yield + terminal_yield
-    cursor.clse()
+    cursor.close()
     return total_yield
