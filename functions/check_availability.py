@@ -8,7 +8,7 @@ def check_availability(connect, icao, player):
                             join game 
                                  on game.player_airports_id = player_airports.id 
                    where gps_code=%s and game.name = %s
-                   """,(icao, player))
+                   """,(icao, player,))
     result = cursor.fetchone()
     cursor.close()
     if result is None:
