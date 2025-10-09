@@ -1,6 +1,17 @@
-def check_availability(connect, icao):
+def check_availability(connect, icao, player):
     cursor = connect.cursor()
-    cursor.execute("select player_airports_id from airport where ident=%s", (icao,))
+    cursor.execute("""
+                   select airport.player_airports_id 
+                   from airport 
+                            join player_airports 
+                                 on airport.player_airports_id = player_airports.id 
+                            join game 
+                                 on game.player_airports_id = player_airports.id 
+                   where gps_code=%s and game.name = %s
+                   """,(icao, player))
     result = cursor.fetchone()
     cursor.close()
-    return result[0]
+    if result is None:
+        return True
+    else:
+        return False

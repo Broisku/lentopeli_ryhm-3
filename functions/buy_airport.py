@@ -3,8 +3,8 @@ from functions.check_availability import check_availability
 
 def buy_airport(icao, connect, player):
     #tarkistetaan ensin onko lentokenttä saatavilla
-    if check_availability(connect, icao):
-        print("Airport is not available for purchase")
+    if not check_availability(connect, icao, player):
+        print("You already own this airport!")
         return
 
     cursor = connect.cursor(buffered=True)
