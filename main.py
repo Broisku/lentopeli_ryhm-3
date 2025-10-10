@@ -12,6 +12,7 @@ import mysql.connector
 
 from functions.buy_airport import buy_airport
 from functions.check_username import check_username
+from functions.get_player_yield import get_player_yield
 from functions.show_airports import show_airports
 from functions.check_time import check_time
 from functions.view_own_airports import view_own_airports
@@ -63,6 +64,8 @@ while True:
     elif player_input == "view money":
         balance = give_bank_balance(connect, player)
         print(f"Your balance is: {balance:,}")
+        if view_own_airports(connect, player):
+            print(f"The total yield of your airports is: {get_player_yield(connect, player)}")
     elif player_input == "next week":
         time = time + 1
         cursor = connect.cursor(buffered=True)
