@@ -54,5 +54,5 @@ def constructions(connect):
         cursor.execute("""update player_runway
                           set status = 'operational'
                           where construction_weeks_left = 0 and status='under_construction'""")
-
+    connect.commit()
     cursor.close()
