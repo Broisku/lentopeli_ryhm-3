@@ -1,3 +1,5 @@
+## HUOM: tick-looppi on kokonaan uudessa branchissa
+
 flight_game on tycoon tyyppinen peli, jossa pelaaja voi ostaa, hallita sekä laajentaa lentokenttiä. Pelialueena toimii koko maailma.
 
 Google slides -esitys: https://docs.google.com/presentation/d/1I-xyIwyjQkKNC5q3b_cKXESJnfo__7F8rOGcOQvtc18/edit?usp=sharing
