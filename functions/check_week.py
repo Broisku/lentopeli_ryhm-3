@@ -1,4 +1,4 @@
-def check_time(connect, player):
+def check_week(connect, player):
     cursor = connect.cursor(buffered=True)
     cursor.execute("select time from game where name = %s", (player,))
     result = cursor.fetchone()
