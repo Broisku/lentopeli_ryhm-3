@@ -105,3 +105,4 @@ while True:
                 elif runway_terminal == "terminals":
                     icao = input("Enter icao of your airport ")
                     view_terminal(connect, player, icao)
+                    test test
