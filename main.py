@@ -2,6 +2,8 @@ import mysql.connector
 import time
 import threading
 import queue
+import sys
+import os
 from functions.buy_airport import buy_airport
 from functions.check_username import check_username
 from functions.get_player_yield import get_player_yield
@@ -40,13 +42,18 @@ if not check_username(connect, player):
     print("")
     print("New game created")
     print("")
+
 else:
     print("")
     print("Welcome back " + player + "!")
     print("")
     week = check_week(connect, player)
 
+
 print("Enter your command here OR type 'commands' to view available commands ")
+
+
+#asetuksia: yksi ticki kuluu kymmenessä sekunnissa
 
 TICK_RATE = 0.1
 TICK_TIME = 1 / TICK_RATE
@@ -56,12 +63,21 @@ running = True
 last = time.perf_counter()
 
 
+#alla on erillinen input threadi, joka ajaa main-loopin kanssa samaan aikaan
+#syy: ilman tätä aiempi main-loopissa ollut input() pausetti koko loopin sekä ajan kulun
+
 player_input_queue = queue.Queue()
 
 def get_input():
-    while True:
-        user_input = input("> ")
-        player_input_queue.put(user_input)
+    global running
+    while running:
+        try:
+            thread_input = input("> ")
+            if not running:
+                break
+            player_input_queue.put(thread_input)
+        except EOFError:
+            break
 
 input_thread = threading.Thread(target=get_input)
 input_thread.start()
@@ -87,16 +103,17 @@ while running:
         add_yield(connect, player)
         print ("")
         print(f"Week {check_week(connect, player)}")
-        print("> ")
 
 
-    if not player_input_queue.empty():
-        player_input = player_input_queue.get()
+    try:
+        cmd = player_input_queue.get_nowait() #tämä hakee komennot jonosta, johon input thread on ne laittanut
+    except queue.Empty:
+        cmd = None
 
 
-        #seuraavat suoritetaan vain pelaajan käskystä:
+    if cmd: #seuraavat suoritetaan vain jos jonossa on käskyjä
 
-        if player_input == "commands":
+        if cmd == "commands":
             available_commands = ["exit game", "pause", "resume", "view money", "view my airports", "view airports", "buy airports"]
             print("")
             print("Available commands:")
@@ -105,24 +122,32 @@ while running:
                 print(command)
 
 
-        elif player_input == "exit game":
+        elif cmd == "exit game":
             connect.close()
             running = False
 
+            try: #tämä simuloi enterin painamista (ei välttämättä toimi IDEssä, vaan oikeassa konsolissa)
+                import msvcrt #pycharm voi hälyttää tästä (ei ole ongelma)
+                msvcrt.putch(b'\n') #windows-versio
 
-        elif player_input == "pause":
+            except ImportError:
+                os.write(sys.stdin.fileno(), b"\n") #mac/linux versio
+
+            input_thread.join() #odottaa, että input threadi ehtii päättymään ennen kuin sulkee pelin (ei crashaa)
+            break
+
+
+        elif cmd == "pause":
             paused = True
             print("Game paused")
-            print("> ")
 
 
-        elif player_input == "resume":
+        elif cmd == "resume":
             paused = False
             print("Game resumed")
-            print("> ")
 
 
-        elif player_input == "view money":
+        elif cmd == "view money":
             balance = give_bank_balance(connect, player)
             print(f"Your balance is: {balance:,}")
 
@@ -130,7 +155,7 @@ while running:
                 print(f"The total yield of your airports is: {get_player_yield(connect, player)}")
 
 
-        elif player_input == "view my airports":
+        elif cmd == "view my airports":
             own_airports = view_own_airports(connect, player)
 
             if not own_airports:
@@ -164,11 +189,11 @@ while running:
                         view_terminal(connect, player, icao)
 
 
-        elif player_input == "view airports":
+        elif cmd == "view airports":
             show_airports(connect)
 
 
-        elif player_input == "buy airports":
+        elif cmd == "buy airports":
             icao = input("Enter icao code of the airport you wish to purchase or type exit: ")
 
             if icao == "exit":
@@ -178,4 +203,4 @@ while running:
                 buy_airport(icao, connect, player)
 
 
-    time.sleep(0.1) #vähentää cpu-loadia, koska tarkistaa vain 0.1 sekunnin välein, onko 1 ticki kulunut
+    time.sleep(0.01) #vähentää cpu-loadia, koska tarkistaa vain 0.01 (eikä 0.000001 tms.) sekunnin välein, onko 1 ticki kulunut
