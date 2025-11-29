@@ -1,3 +1,6 @@
+from inputThread import player_input_queue
+
+
 def show_airports(connect):
     sql = f"""
     select type, airport.name, municipality, gps_code, iata_code, elevation_ft, latitude_deg, longitude_deg
@@ -6,7 +9,8 @@ def show_airports(connect):
     where country.iso_country = %s
     order by type desc
     """
-    country_iso = input("Enter the ISO country code (in CAPS): ")
+    print("Enter the ISO country code (in CAPS): ")
+    country_iso = player_input_queue.get()
     cursor = connect.cursor()
     cursor.execute(sql, (country_iso,))
     airports = cursor.fetchall()

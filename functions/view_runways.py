@@ -1,5 +1,6 @@
 from functions.get_airport_type import get_airport_type
 from functions.buy_runway import buy_runway
+from inputThread import player_input_queue
 
 
 def view_runway(connect, player, icao):
@@ -54,7 +55,8 @@ def view_runway(connect, player, icao):
             print("No runways available")
             return
         print("cost for runway: 3,000,000")
-        player_action = input("type buy to buy runway or type exit ")
+        print("type buy to buy runway or type exit ")
+        player_action = player_input_queue.get()
         if player_action == "buy":
             buy_runway(connect, player, icao)
         elif player_action == "exit":
@@ -71,7 +73,8 @@ def view_runway(connect, player, icao):
             print("No runways available")
             return
         print("cost for runway: 6,000,000")
-        player_action = input("type buy to buy runway or type exit ")
+        print("type buy to buy runway or type exit ")
+        player_action = player_input_queue.get()
         if player_action == "buy":
             buy_runway(connect, player, icao)
         elif player_action == "exit":
@@ -91,7 +94,8 @@ def view_runway(connect, player, icao):
             print("No runways available")
             return
         print("cost for runway: 9,000,000")
-        player_action = input("type buy to buy runway or type exit ")
+        print("type buy to buy runway or type exit ")
+        player_action = player_input_queue.get()
         if player_action == "buy":
             buy_runway(connect, player, icao)
         elif player_action == "exit":

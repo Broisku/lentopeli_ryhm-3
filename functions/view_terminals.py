@@ -1,5 +1,6 @@
 from functions.get_airport_type import get_airport_type
 from functions.buy_terminal import buy_terminal
+from inputThread import player_input_queue
 
 
 def view_terminal(connect, player, icao):
@@ -74,7 +75,8 @@ def view_terminal(connect, player, icao):
             return
         print("cost for terminal: 12,000,000")
 
-    player_action = input("type buy to buy terminal or type exit ")
+    print("type buy to buy terminal or type exit ")
+    player_action = player_input_queue.get()
     if player_action == "buy":
         buy_terminal(connect, player, icao)
     elif player_action == "exit":

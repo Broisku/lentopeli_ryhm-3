@@ -15,6 +15,7 @@ from functions.view_terminals import view_terminal
 from functions.get_bank_balance import give_bank_balance
 from functions.add_yield import add_yield
 from functions.constructions import constructions
+from inputThread import get_input, player_input_queue
 
 connect = mysql.connector.connect(
          host='localhost',
@@ -62,24 +63,10 @@ paused = False
 running = True
 last = time.perf_counter()
 
+def is_running():
+    return running
 
-#alla on erillinen input threadi, joka ajaa main-loopin kanssa samaan aikaan
-#syy: ilman tätä aiempi main-loopissa ollut input() pausetti koko loopin sekä ajan kulun
-
-player_input_queue = queue.Queue()
-
-def get_input():
-    global running
-    while running:
-        try:
-            thread_input = input("> ")
-            if not running:
-                break
-            player_input_queue.put(thread_input)
-        except EOFError:
-            break
-
-input_thread = threading.Thread(target=get_input)
+input_thread = threading.Thread(target=get_input, args=(is_running,))
 input_thread.start()
 
 
@@ -162,31 +149,39 @@ while running:
                 print("You dont have airports yet")
 
             else:
+                paused = True
                 print("Your airports:")
                 print(
                     "HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
                 for airport in own_airports:
                     print(airport)
 
-                player_input = input("type upgrades to view available upgrades or type exit ")
+                print("type upgrades to view available upgrades or type exit ")
+                player_input = player_input_queue.get()
 
                 if player_input == "exit":
+                    paused = False
                     continue
 
                 elif player_input == "upgrades":
-                    runway_terminal = input(
-                        "type runways to view available runways or type terminals to view available terminals or type exit ")
+                    print("type runways to view available runways or type terminals to view available terminals or type exit ")
+                    runway_terminal = player_input_queue.get()
 
                     if runway_terminal == "exit":
+                        paused = False
                         continue
 
                     elif runway_terminal == "runways":
-                        icao = input("Enter icao of your airport ")
+                        print("Enter icao of your airport ")
+                        icao = player_input_queue.get()
                         view_runway(connect, player, icao)
 
                     elif runway_terminal == "terminals":
-                        icao = input("Enter icao of your airport ")
+                        print("Enter icao of your airport ")
+                        icao = player_input_queue.get()
                         view_terminal(connect, player, icao)
+
+                    paused = False
 
 
         elif cmd == "view airports":
@@ -194,7 +189,8 @@ while running:
 
 
         elif cmd == "buy airports":
-            icao = input("Enter icao code of the airport you wish to purchase or type exit: ")
+            print("Enter icao code of the airport you wish to purchase or type exit: ")
+            icao = player_input_queue.get()
 
             if icao == "exit":
                 continue
