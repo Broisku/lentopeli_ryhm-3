@@ -1,0 +1,37 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.menu {
+    max-width: max-content;
+    margin-inline: auto;
+    text-align: center;
+}
+
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+li {
+    margin: 0.5em;
+    border: 2px solid;
+}
+
+li a {
+    max-width: 100%;
+    padding: 20px 50px;
+    display: block;
+
+    font-size: large;
+    text-decoration: none;
+    color: black;
+}
+
+#name-form {
+    display: flex;
+    flex-direction: column;
+}
+
+
