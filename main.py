@@ -5,6 +5,8 @@ import queue
 import sys
 import os
 from functions.buy_airport import buy_airport
+from functions.check_new_event import check_new_event
+from functions.check_running_event import check_running_event
 from functions.check_username import check_username
 from functions.get_player_yield import get_player_yield
 from functions.show_airports import show_airports
@@ -90,6 +92,8 @@ while running:
         add_yield(connect, player)
         print ("")
         print(f"Week {check_week(connect, player)}")
+        check_running_event(connect, player)
+        check_new_event(connect, player)
 
 
     try:
@@ -101,7 +105,7 @@ while running:
     if cmd: #seuraavat suoritetaan vain jos jonossa on käskyjä
 
         if cmd == "commands":
-            available_commands = ["exit game", "pause", "resume", "view money", "view my airports", "view airports", "buy airports"]
+            available_commands = ["exit game", "pause", "resume", "faster", "slower", "view money", "view my airports", "view airports", "buy airports"]
             print("")
             print("Available commands:")
             print("")
@@ -132,6 +136,18 @@ while running:
         elif cmd == "resume":
             paused = False
             print("Game resumed")
+
+
+        elif cmd == "faster":
+            TICK_RATE = 0.8
+            TICK_TIME = 1 / TICK_RATE
+            print("Game is now faster")
+
+
+        elif cmd == "slower":
+            TICK_RATE = 0.1
+            TICK_TIME = 1 / TICK_RATE
+            print("Game is now slower")
 
 
         elif cmd == "view money":
