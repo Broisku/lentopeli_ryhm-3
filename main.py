@@ -1,26 +1,23 @@
-"""
-Sisältö:
-1. Tietokantayhteys
-2. Pelin aloitus
-3. Peli-loop
-4. Pelin lopetus
-"""
-
-
-
 import mysql.connector
-
+import time
+import threading
+import queue
+import sys
+import os
 from functions.buy_airport import buy_airport
+from functions.check_new_event import check_new_event
+from functions.check_running_event import check_running_event
 from functions.check_username import check_username
 from functions.get_player_yield import get_player_yield
 from functions.show_airports import show_airports
-from functions.check_time import check_time
+from functions.check_week import check_week
 from functions.view_own_airports import view_own_airports
 from functions.view_runways import view_runway
 from functions.view_terminals import view_terminal
 from functions.get_bank_balance import give_bank_balance
 from functions.add_yield import add_yield
 from functions.constructions import constructions
+from inputThread import get_input, player_input_queue
 
 connect = mysql.connector.connect(
          host='localhost',
@@ -36,72 +33,186 @@ def create_game(g_money,g_time,g_name):
     sql = "INSERT INTO game (money,time,name) VALUES (%s,%s,%s)"
     cursor = connect.cursor()
     cursor.execute(sql, (g_money,g_time,g_name,))
-
+    connect.commit()
+    cursor.close()
 
 
 player = input("Enter your name: ")
-if check_username(connect, player) == False:
+if not check_username(connect, player):
     money = 10000000
-    time = 0
-    create_game(money, time, player)
+    week = 0
+    create_game(money, week, player)
+    print("")
     print("New game created")
+    print("")
+
 else:
+    print("")
     print("Welcome back " + player + "!")
-    time = check_time(connect, player)
+    print("")
+    week = check_week(connect, player)
 
 
-while True:
-    print(f"Week {check_time(connect, player)}")
-    player_input = input("Enter your command or type commands to view available commands ")
-    if player_input == "view airports":
-        show_airports(connect)
-    elif player_input == "buy airports":
-        icao = input("Enter icao code of the airport you wish to purchase or type exit: ")
-        if icao == "exit":
-            continue
-        else:
-            buy_airport(icao, connect, player)
-    elif player_input == "view money":
-        balance = give_bank_balance(connect, player)
-        print(f"Your balance is: {balance:,}")
-        if view_own_airports(connect, player):
-            print(f"The total yield of your airports is: {get_player_yield(connect, player)}")
-    elif player_input == "next week":
-        time = time + 1
+print("Enter your command here OR type 'commands' to view available commands ")
+
+
+#asetuksia: yksi ticki kuluu kymmenessä sekunnissa
+
+TICK_RATE = 0.1
+TICK_TIME = 1 / TICK_RATE
+
+paused = False
+running = True
+last = time.perf_counter()
+
+def is_running():
+    return running
+
+input_thread = threading.Thread(target=get_input, args=(is_running,))
+input_thread.start()
+
+
+#pelin main-looppi:
+
+while running:
+    now = time.perf_counter()
+    elapsed = now - last
+
+
+    #asiat, jotka suoritetaan joka ticki:
+
+    if not paused and elapsed >= TICK_TIME:
+        last = now
+        week += 1
         cursor = connect.cursor(buffered=True)
-        cursor.execute("update game set time = %s where name = %s ", (time, player))
+        cursor.execute("update game set time = %s where name = %s ", (week, player))
+        connect.commit()
         cursor.close()
         constructions(connect)
         add_yield(connect, player)
-    elif player_input == "commands":
-        available_commands = ["exit game", "next week", "view money", "view airports", "view my airports", "buy airports"]
-        print("Available commands:")
-        for command in available_commands:
-            print(command)
-    elif player_input == "exit game":
-        connect.close()
-        break
-    elif player_input == "view my airports":
-        own_airports = view_own_airports(connect, player)
-        if not own_airports:
-            print("You dont have airports yet")
-        else:
-            print("Your airports:")
-            print(
-                "HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
-            for airport in own_airports:
-                print(airport)
-            player_input = input("type upgrades to view available upgrades or type exit ")
-            if player_input == "exit":
-                continue
-            elif player_input == "upgrades":
-                runway_terminal = input(
-                    "type runways to view available runways or type terminals to view available terminals or type exit ")
-                if runway_terminal == "exit":
+        print ("")
+        print(f"Week {check_week(connect, player)}")
+        check_running_event(connect, player)
+        check_new_event(connect, player)
+
+
+    try:
+        cmd = player_input_queue.get_nowait() #tämä hakee komennot jonosta, johon input thread on ne laittanut
+    except queue.Empty:
+        cmd = None
+
+
+    if cmd: #seuraavat suoritetaan vain jos jonossa on käskyjä
+
+        if cmd == "commands":
+            available_commands = ["exit game", "pause", "resume", "faster", "slower", "view money", "view my airports", "view airports", "buy airports"]
+            print("")
+            print("Available commands:")
+            print("")
+            for command in available_commands:
+                print(command)
+
+
+        elif cmd == "exit game":
+            connect.close()
+            running = False
+
+            try: #tämä simuloi enterin painamista (ei välttämättä toimi IDEssä, vaan oikeassa konsolissa)
+                import msvcrt #pycharm voi hälyttää tästä (ei ole ongelma)
+                msvcrt.putch(b'\n') #windows-versio
+
+            except ImportError:
+                os.write(sys.stdin.fileno(), b"\n") #mac/linux versio
+
+            input_thread.join() #odottaa, että input threadi ehtii päättymään ennen kuin sulkee pelin (ei crashaa)
+            break
+
+
+        elif cmd == "pause":
+            paused = True
+            print("Game paused")
+
+
+        elif cmd == "resume":
+            paused = False
+            print("Game resumed")
+
+
+        elif cmd == "faster":
+            TICK_RATE = 0.8
+            TICK_TIME = 1 / TICK_RATE
+            print("Game is now faster")
+
+
+        elif cmd == "slower":
+            TICK_RATE = 0.1
+            TICK_TIME = 1 / TICK_RATE
+            print("Game is now slower")
+
+
+        elif cmd == "view money":
+            balance = give_bank_balance(connect, player)
+            print(f"Your balance is: {balance:,}")
+
+            if view_own_airports(connect, player):
+                print(f"The total yield of your airports is: {get_player_yield(connect, player)}")
+
+
+        elif cmd == "view my airports":
+            own_airports = view_own_airports(connect, player)
+
+            if not own_airports:
+                print("You dont have airports yet")
+
+            else:
+                paused = True
+                print("Your airports:")
+                print(
+                    "HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
+                for airport in own_airports:
+                    print(airport)
+
+                print("type upgrades to view available upgrades or type exit ")
+                player_input = player_input_queue.get()
+
+                if player_input == "exit":
+                    paused = False
                     continue
-                elif runway_terminal == "runways":
-                    icao = input("Enter icao of your airport ")
-                    view_runway(connect, player, icao)
-                elif runway_terminal == "terminals":
-                    icao = input("Enter icao of your airport ")
-                    view_terminal(connect, player, icao)
+
+                elif player_input == "upgrades":
+                    print("type runways to view available runways or type terminals to view available terminals or type exit ")
+                    runway_terminal = player_input_queue.get()
+
+                    if runway_terminal == "exit":
+                        paused = False
+                        continue
+
+                    elif runway_terminal == "runways":
+                        print("Enter icao of your airport ")
+                        icao = player_input_queue.get()
+                        view_runway(connect, player, icao)
+
+                    elif runway_terminal == "terminals":
+                        print("Enter icao of your airport ")
+                        icao = player_input_queue.get()
+                        view_terminal(connect, player, icao)
+
+                    paused = False
+
+
+        elif cmd == "view airports":
+            show_airports(connect)
+
+
+        elif cmd == "buy airports":
+            print("Enter icao code of the airport you wish to purchase or type exit: ")
+            icao = player_input_queue.get()
+
+            if icao == "exit":
+                continue
+
+            else:
+                buy_airport(icao, connect, player)
+
+
+    time.sleep(0.01) #vähentää cpu-loadia, koska tarkistaa vain 0.01 (eikä 0.000001 tms.) sekunnin välein, onko 1 ticki kulunut

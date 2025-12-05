@@ -30,4 +30,5 @@ def buy_runway(connect, player, icao):
                    """, (airport_id, runway_id, runway["construction_time"]))
     cursor.execute("update game set money = money - %s where name = %s", (runway["cost"], player,))
     print("Runway purchase successful!")
+    connect.commit()
     cursor.close()

@@ -17,6 +17,7 @@ def constructions(connect):
         where construction_weeks_left = 0 and status='under_construction'""")
         results = cursor.fetchall()
         if cursor.rowcount > 0:
+            print("Your terminal has finished constructions!")
             for result in results:
                 player_airports_id = result[0]
                 terminal_types_id = result[1]
@@ -41,6 +42,7 @@ def constructions(connect):
         where construction_weeks_left = 0 and status='under_construction'""")
         results = cursor.fetchall()
         if cursor.rowcount > 0:
+            print("Your runway has finished constructions!")
             for result in results:
                 player_airports_id = result[0]
                 runway_types_id = result[1]
@@ -54,5 +56,5 @@ def constructions(connect):
         cursor.execute("""update player_runway
                           set status = 'operational'
                           where construction_weeks_left = 0 and status='under_construction'""")
-
+    connect.commit()
     cursor.close()

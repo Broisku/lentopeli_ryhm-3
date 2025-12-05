@@ -28,4 +28,5 @@ def buy_terminal(connect, player, icao):
                    """, (airport_id, terminal_id, terminal["construction_time"]))
     cursor.execute("update game set money = money - %s where name = %s", (terminal["cost"], player,))
     print("Terminal purchase successful!")
+    connect.commit()
     cursor.close()

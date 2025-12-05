@@ -22,6 +22,7 @@ def buy_airport(icao, connect, player):
         player_airport_id = cursor.lastrowid
         cursor.execute("update airport set player_airports_id = %s where gps_code = %s", (player_airport_id, icao,))
         cursor.execute("update game set player_airports_id = %s where name = %s", (player_airport_id, player,))
+        connect.commit()
         print(f"{icao} airport purchased succesfully")
     else:
         print("You do not have enough money")

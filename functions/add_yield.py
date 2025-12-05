@@ -10,3 +10,5 @@ def add_yield(connect, player):
         for y in yields:
             sum_yields += y[0]
         cursor.execute("update game set money = money + %s where name = %s", (sum_yields, player))
+        connect.commit()
+        cursor.close()
