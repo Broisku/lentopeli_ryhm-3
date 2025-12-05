@@ -71365,8 +71365,46 @@ foreign key (other_airports_id) references other_airports(id)
 );
 create table event_types(
 id int primary key,
-description varchar(100)
+title varchar(100),
+description varchar(300)
 );
+
+insert into event_types(id, title, description)
+values (0, "Meteoriitti!", "Suuri meteoriitti tippui sinun lentokentällesi ja osui juuri sinun kiitoradallesi. 
+Kiitorata on käyttökelvoton seuraavat 8 viikkoa. Korjauskustannukset ovat 75 000€ viikossa."
+);
+
+insert into event_types(id, title, description)
+values (1, "Turistirysä", "Kaupungissasi järjestetään suuri kansainvälinen urheilutapahtuma. 
+Lentokenttäsi tuottaa 100% enemmän seuraavat kolme viikkoa."
+);
+
+insert into event_types(id, title, description)
+values (2, "Koiranilma", "Vaarallinen myrsky kulkee lentokentän alueella. Lentokoneet eivät pääse nousemaan eikä laskeutumaan lentokentällesi. 
+Lentokenttä ei tuota rahaa seuraavan kahden viikon ajan."
+);
+
+insert into event_types(id, title, description)
+values (3, "Voi ei!", "Matkalaukkujen hihnaston automoitu järjestelmä kaatui terminaaleissasi. 
+Terminaalit tuottavat 50% vähemmän seuraavan 4 viikon ajan, sillä vaurio on erittäin laaja."
+);
+
+insert into event_types(id, title, description)
+values (4, "Raha kelpaa aina", "Eräs VIP-henkilö pyytää laskeutua lentokentällesi yksityiskoneellaan ja haluaa erikoisjärjestelyitä. 
+Hän on valmis maksamaan niistä. Saat miljoona euroa tilillesi heti."
+);
+
+create table player_events(
+id int auto_increment not null,
+event_weeks_left int,
+original_yield int,
+game_id int unique,
+event_types_id int,
+primary key (id),
+foreign key (game_id) references game(id),
+foreign key (event_types_id) references event_types(id)
+);
+
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
 values (0, 1500, 3000000, 12, 20000, 60000);
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
