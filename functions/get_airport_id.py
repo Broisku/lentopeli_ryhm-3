@@ -3,7 +3,7 @@ def get_airport_id(connect, player, icao):
     cursor.execute("""
     select player_airports.id
     from player_airports, game, airport
-                   where game.player_airports_id = player_airports.id
+                   where player_airports.game_id = game.id
                    and airport.player_airports_id = player_airports.id
                    and game.name = %s
                    and gps_code = %s

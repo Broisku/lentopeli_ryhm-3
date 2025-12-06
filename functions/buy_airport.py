@@ -16,14 +16,19 @@ def buy_airport(icao, connect, player):
     airport_cost = get_airport_cost(icao, connect)
 
     if money >= airport_cost:
+
+        # päivitetään pelaajan raha
         cursor.execute("update game set money = money - %s where name = %s", (airport_cost, player,))
-        add_airport = "insert into player_airports(yield) values(0)"
-        cursor.execute(add_airport)
+
+        cursor.execute("insert into player_airports(yield, game_id) select 0, game.id from game where name = %s", (player,))
+
         player_airport_id = cursor.lastrowid
         cursor.execute("update airport set player_airports_id = %s where gps_code = %s", (player_airport_id, icao,))
-        cursor.execute("update game set player_airports_id = %s where name = %s", (player_airport_id, player,))
-        connect.commit()
-        print(f"{icao} airport purchased succesfully")
+
+        print(f"{icao} airport purchased succesfully!")
+
     else:
-        print("You do not have enough money")
+        print("You don't have enough money for this airport!")
+
+    connect.commit()
     cursor.close()

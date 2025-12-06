@@ -111,6 +111,7 @@ while running:
             print("")
             for command in available_commands:
                 print(command)
+                print("")
 
 
         elif cmd == "exit game":
@@ -162,10 +163,11 @@ while running:
             own_airports = view_own_airports(connect, player)
 
             if not own_airports:
-                print("You dont have airports yet")
+                print("You don't have any airports yet!")
 
             else:
                 paused = True
+                print("Game paused")
                 print("Your airports:")
                 print(
                     "HOW TO READ: airport size, name, municipality, icao code, iata code, elevation in feet, latitude, longitude, yield")
@@ -177,6 +179,7 @@ while running:
 
                 if player_input == "exit":
                     paused = False
+                    print("Game resumed")
                     continue
 
                 elif player_input == "upgrades":
@@ -185,19 +188,21 @@ while running:
 
                     if runway_terminal == "exit":
                         paused = False
+                        print("Game resumed")
                         continue
 
                     elif runway_terminal == "runways":
-                        print("Enter icao of your airport ")
+                        print("Enter the ICAO code of your airport ")
                         icao = player_input_queue.get()
                         view_runway(connect, player, icao)
 
                     elif runway_terminal == "terminals":
-                        print("Enter icao of your airport ")
+                        print("Enter the ICAO code of your airport ")
                         icao = player_input_queue.get()
                         view_terminal(connect, player, icao)
 
                     paused = False
+                    print("Game resumed")
 
 
         elif cmd == "view airports":
@@ -205,7 +210,7 @@ while running:
 
 
         elif cmd == "buy airports":
-            print("Enter icao code of the airport you wish to purchase or type exit: ")
+            print("Enter ICAO code of the airport you wish to purchase or type exit: ")
             icao = player_input_queue.get()
 
             if icao == "exit":

@@ -24,7 +24,7 @@ def view_runway(connect, player, icao):
     cursor.execute("""
                     select type from airport join player_airports
                     on airport.player_airports_id = player_airports.id join game
-                   on game.player_airports_id = player_airports.id
+                   on player_airports.game_id = game.id
                    where game.name = %s and gps_code = %s""", (player, icao,))
     result_airport_type = cursor.fetchone()
     airport_type = result_airport_type[0]
@@ -36,7 +36,7 @@ def view_runway(connect, player, icao):
                         join player_airports pa1
                              on player_runway.player_airports_id = pa1.id
                         join game
-                            on game.player_airports_id = pa1.id
+                            on pa1.game_id = game.id
                         join player_airports pa2
                              on player_runway.player_airports_id = pa2.id
                         join airport
@@ -50,7 +50,7 @@ def view_runway(connect, player, icao):
         if len(result_runway_count) < 1:
             print("Runways available for small airport: 2 x 1500m runway")
         elif len(result_runway_count) < 2:
-            print("Runways available: 1 x 1500m runway")
+            print("Runways still available: 1 x 1500m runway")
         else:
             print("No runways available")
             return

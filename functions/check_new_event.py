@@ -16,7 +16,7 @@ def check_new_event(connect, player):
     if result is not None:
         return
 
-    luku = random.randint(1, 30)
+    luku = random.randint(1, 25)
 
     if luku > 5:
         return
@@ -32,7 +32,7 @@ def check_new_event(connect, player):
             cursor.execute("""
                     select status, yield from player_runway inner join player_airports 
                     on player_runway.player_airports_id = player_airports.id
-                    inner join game on game.player_airports_id = player_airports.id
+                    inner join game on player_airports.game_id = game.id
                     where game.name = %s
                     limit 1
             """, (player,))
@@ -69,7 +69,7 @@ def check_new_event(connect, player):
             # sitten itse efekti: kiitoradan yieldi -75 000
             cursor.execute("""update player_runway 
                     inner join player_airports on player_runway.player_airports_id = player_airports.id 
-                    inner join game on game.player_airports_id = player_airports.id 
+                    inner join game on player_airports.game_id = game.id 
                     set yield = -75000
                     where game.name = %s and player_runway.id = 1
                            """, (player,))
@@ -93,7 +93,7 @@ def check_new_event(connect, player):
                            from player_runway
                                     inner join player_airports
                                                on player_runway.player_airports_id = player_airports.id
-                                    inner join game on game.player_airports_id = player_airports.id
+                                    inner join game on player_airports.game_id = game.id
                            where game.name = %s limit 1
                            """, (player,))
             result = cursor.fetchone()
@@ -129,7 +129,7 @@ def check_new_event(connect, player):
 
             cursor.execute("""
                            update player_airports
-                           inner join game on game.player_airports_id = player_airports.id
+                           inner join game on player_airports.game_id = game.id
                            set yield = yield * 2
                            where game.name = %s
                             limit 1
@@ -155,7 +155,7 @@ def check_new_event(connect, player):
                            from player_runway
                                     inner join player_airports
                                                on player_runway.player_airports_id = player_airports.id
-                                    inner join game on game.player_airports_id = player_airports.id
+                                    inner join game on player_airports.game_id = game.id
                            where game.name = %s
                            limit 1
                            """, (player,))
@@ -191,7 +191,7 @@ def check_new_event(connect, player):
 
             cursor.execute("""
                 update player_runway inner join player_airports on player_airports_id = player_airports.id 
-                inner join game on game.player_airports_id = player_airports.id 
+                inner join game on player_airports.game_id = game.id 
                 set yield = 0
                 where game.name = %s
                             """, (player,))
@@ -216,7 +216,7 @@ def check_new_event(connect, player):
                            from player_terminal
                                     inner join player_airports
                                                on player_terminal.player_airports_id = player_airports.id
-                                    inner join game on game.player_airports_id = player_airports.id
+                                    inner join game on player_airports.game_id = game.id
                            where game.name = %s
                            limit 1
                            """, (player,))
@@ -253,7 +253,7 @@ def check_new_event(connect, player):
 
             cursor.execute("""
                            update player_terminal inner join player_airports on player_airports_id = player_airports.id 
-                            inner join game on game.player_airports_id = player_airports.id 
+                            inner join game on player_airports.game_id = game.id 
                             set yield = %s / 2
                             where game.name = %s
                             """, (org_yield, player,))
@@ -278,7 +278,7 @@ def check_new_event(connect, player):
                            from player_runway
                                     inner join player_airports
                                                on player_runway.player_airports_id = player_airports.id
-                                    inner join game on game.player_airports_id = player_airports.id
+                                    inner join game on player_airports.game_id = game.id
                            where game.name = %s
                                limit 1
                            """, (player,))

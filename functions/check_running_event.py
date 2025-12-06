@@ -50,7 +50,7 @@ def check_running_event(connect, player):
                 cursor.execute("""update player_runway
                                       inner join player_airports
                                   on player_runway.player_airports_id = player_airports.id
-                                      inner join game on game.player_airports_id = player_airports.id
+                                      inner join game on player_airports.game_id = game.id
                                       set yield = %s
                                   where game.name = %s
                                     limit 1
@@ -61,7 +61,7 @@ def check_running_event(connect, player):
                 cursor.execute("""
                                update player_airports
                                    inner join game
-                               on game.player_airports_id = player_airports.id
+                               on player_airports.game_id = game.id
                                    set yield = %s
                                where game.name = %s
                                    limit 1
@@ -72,7 +72,7 @@ def check_running_event(connect, player):
                 cursor.execute("""
                                update player_runway inner join player_airports
                                on player_airports_id = player_airports.id
-                                   inner join game on game.player_airports_id = player_airports.id
+                                   inner join game on player_airports.game_id = game.id
                                    set yield = %s
                                where game.name = %s
                                """, (org_yieldi, player,))
@@ -82,7 +82,7 @@ def check_running_event(connect, player):
                 cursor.execute("""
                                update player_terminal inner join player_airports
                                on player_airports_id = player_airports.id
-                                   inner join game on game.player_airports_id = player_airports.id
+                                   inner join game on player_airports.game_id = game.id
                                    set yield = %s
                                where game.name = %s
                                """, (org_yieldi, player,))

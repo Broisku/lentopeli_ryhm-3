@@ -3,7 +3,7 @@
 
 def add_yield(connect, player):
     cursor = connect.cursor()
-    cursor.execute("select yield from player_airports join game on game.player_airports_id = player_airports.id where yield != 0 and name = %s", (player,))
+    cursor.execute("select yield from player_airports join game on player_airports.game_id = game.id where yield != 0 and name = %s", (player,))
     yields = cursor.fetchall()
     if yields:
         sum_yields = 0

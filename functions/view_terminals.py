@@ -23,7 +23,7 @@ def view_terminal(connect, player, icao):
     cursor.execute("""
                     select type from airport join player_airports
                     on airport.player_airports_id = player_airports.id join game
-                   on game.player_airports_id = player_airports.id
+                   on player_airports.game_id = game.id
                    where game.name = %s and gps_code = %s""", (player, icao,))
     result_airport_type = cursor.fetchone()
     airport_type = result_airport_type[0]
@@ -35,7 +35,7 @@ def view_terminal(connect, player, icao):
                         join player_airports pa1
                              on player_terminal.player_airports_id = pa1.id
                         join game
-                            on game.player_airports_id = pa1.id
+                            on pa1.game_id = game.id
                         join player_airports pa2
                              on player_terminal.player_airports_id = pa2.id
                         join airport
