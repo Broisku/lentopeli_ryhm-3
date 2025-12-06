@@ -71286,22 +71286,35 @@ foreign key (iso_country) references country(iso_country)
 alter table country
 drop column wikipedia_link
 ;
-create table player_airports(
+
+create table game(
 id int not null auto_increment,
-yield int,
+money int not null,
+time int not null,
+name varchar(40),
 primary key (id)
 );
+
+create table player_airports(
+id int not null unique auto_increment,
+yield int,
+game_id int,
+primary key (id),
+constraint fk_player_airports_game foreign key (game_id) references game(id)
+);
+
 alter table airport
 add column player_airports_id int,
 add constraint airport_player_airports
-foreign key (player_airports_id)
-references player_airports(id)
-;
+foreign key (player_airports_id) references player_airports(id),
+add constraint unique_owned_airport unique (gps_code, player_airports_id);
+
 create table other_airports(
 id int not null auto_increment,
 yield int,
 primary key (id)
 );
+
 create table runway_types(
 id int,
 length int,
@@ -71311,6 +71324,7 @@ operating_cost int,
 yield int,
 primary key (id)
 );
+
 create table terminal_types(
 id int,
 size varchar(40),
@@ -71320,6 +71334,7 @@ operating_cost int,
 yield int,
 primary key (id)
 );
+
 create table player_runway(
 id int auto_increment primary key,
 player_airports_id int,
@@ -71329,6 +71344,7 @@ status enum('under_construction', 'operational') default 'under_construction',
 foreign key (player_airports_id) references player_airports(id),
 foreign key (runway_types_id) references runway_types(id)
 );
+
 create table other_runway(
 other_airports_id int,
 runway_types_id int,
@@ -71336,6 +71352,7 @@ primary key (other_airports_id, runway_types_id),
 foreign key (other_airports_id) references other_airports(id),
 foreign key (runway_types_id) references runway_types(id)
 );
+
 create table player_terminal(
 id int auto_increment primary key,
 player_airports_id int,
@@ -71345,6 +71362,7 @@ status enum('under_construction', 'operational') default 'under_construction',
 foreign key (player_airports_id) references player_airports(id),
 foreign key (terminal_types_id) references terminal_types(id)
 );
+
 create table other_terminal(
 other_airports_id int,
 terminal_types_id int,
@@ -71352,17 +71370,7 @@ primary key (other_airports_id, terminal_types_id),
 foreign key (other_airports_id) references other_airports(id),
 foreign key (terminal_types_id) references terminal_types(id)
 );
-create table game(
-id int not null auto_increment,
-money int not null,
-time int not null,
-name varchar(40),
-player_airports_id int,
-other_airports_id int,
-primary key (id),
-foreign key (player_airports_id) references player_airports(id),
-foreign key (other_airports_id) references other_airports(id)
-);
+
 create table event_types(
 id int primary key,
 title varchar(100),
@@ -71417,6 +71425,7 @@ insert into terminal_types(id, size, cost, construction_time, operating_cost, yi
 values (1, "medium", 6000000, 24, 40000, 120000);
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
 values (2, "large", 12000000, 48, 80000, 240000);
+
 create user if not exists "flight_game_user"@"localhost" IDENTIFIED by "1234";
 grant select, insert, update, delete on flight_game.* to "flight_game_user"@"localhost";
 flush privileges;
