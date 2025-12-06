@@ -6,8 +6,6 @@ Link to docs: https://docs.google.com/document/d/1aKimyoUgxhR9TuIQnhn2PMnNXQFy1S
 
 ## TODO:
 
-loput inputit vielä pois ja siirrä ne input threadiin, jotta ei pauseta looppia.
-
 ## Database Installation:
 
 open mariadb as root user
