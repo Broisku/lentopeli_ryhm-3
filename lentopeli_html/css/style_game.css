@@ -33,26 +33,27 @@ body {
 }
 
 #map {
-    height: 500px;
-}
-
-footer {
+    width: 100%;
+    height: 100vh;
     flex: 1;
-    background-color: #dddddd;
-    display: grid;
-    place-items: center;
+    position: relative;
 }
-
-footer div {
-    height: 100%;
+#map-toggle-buttons {
+    position: absolute;
+    bottom: 3rem;
+    right: 1rem;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+    flex-direction: column;
 }
-footer button {
-    height: 100%;
-    width: 10rem;
+.toggleBtn {
+    height: 3rem;
+    width: 3rem;
     font-size: 1rem;
     background-color: #b9c3c7;
     cursor: pointer;
 }
-footer button:hover {
+.toggleBtn:hover {
     background-color: #d0dbdf;
 }
