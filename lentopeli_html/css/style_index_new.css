@@ -1,3 +1,15 @@
+@font-face {
+    font-family: BungeeSpice-Regular;
+    src: url("BungeeSpice-Regular.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.mainheader {
+    font-family: BungeeSpice-Regular, serif;
+    font-size: 50px;
+}
+
 body {
     margin: 0;
     font-family: sans-serif;
@@ -34,4 +46,16 @@ li a {
     flex-direction: column;
 }
 
+.background-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
 
+nav {
+    background-color: linen;
+    padding: 1rem;
+}
