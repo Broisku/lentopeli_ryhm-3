@@ -132,6 +132,35 @@ def status(player):
     })
 
 
+# pause api
+
+@app.route("/pause", methods=["POST"])
+def pause():
+    global paused
+    paused = True
+    return jsonify({"paused": True})
+
+@app.route("/resume", methods=["POST"])
+def resume():
+    global paused
+    paused = False
+    return jsonify({"paused": False})
+
+
+# nopeus api
+
+@app.route("/set_speed/<mode>")
+def set_speed(mode):
+    global TICK_TIME
+
+    if mode == "slow":
+        TICK_TIME = 2.0
+    else:
+        TICK_TIME = 1 / TICK_RATE
+
+    return jsonify({"speed": TICK_TIME})
+
+
 
 # airport apit:
 
