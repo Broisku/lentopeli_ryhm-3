@@ -218,3 +218,55 @@ async function updateStats() {
 }
 
 setInterval(updateStats, 1000)
+
+
+// pause nappi
+
+const pauseBtn = document.getElementById("pause");
+let isPaused = false;
+
+pauseBtn.addEventListener("click", async () => {
+  // pause
+  if (!isPaused) {
+    await fetch("http://localhost:5000/pause", { method: "POST" });
+
+    pauseBtn.classList.remove("pause");
+    pauseBtn.classList.add("play");
+    isPaused = true;
+
+  } else {
+    // resume
+    await fetch("http://localhost:5000/resume", { method: "POST" });
+
+    pauseBtn.classList.remove("play");
+    pauseBtn.classList.add("pause");
+
+    isPaused = false;
+  }
+});
+
+pauseBtn.classList.add("pause");
+
+
+//nopeus nappi
+
+const speedBtn = document.getElementById("speed");
+let slowMode = false;
+
+speedBtn.addEventListener("click", () => {
+  slowMode = !slowMode;
+
+  if (slowMode) {
+    // nopeampi
+    speedBtn.classList.remove("normal");
+    speedBtn.classList.add("slow");
+
+    fetch("http://localhost:5000/set_speed/slow");
+  } else {
+    // vaihtaa takaisin normaaliin nopeuteen
+    speedBtn.classList.remove("slow");
+    speedBtn.classList.add("normal");
+
+    fetch("http://localhost:5000/set_speed/normal");
+  }
+});
