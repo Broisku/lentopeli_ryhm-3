@@ -9,7 +9,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const allAirportsLayer = L.layerGroup().addTo(map)
 
 // haetaan lentokentät python apista
-fetch("http://127.0.0.1:5000/airports")
+fetch("http://localhost:5000/airports")
 .then(res => res.json())
 .then(airports => {
   airports.forEach(airport => {
@@ -69,18 +69,15 @@ let showingOwned = false;
 
 const toggle1 = document.getElementById("toggle1");
 
+const player = getPlayerName();
+
 toggle1.addEventListener("click", () => {
-  const player = getPlayerName();
-  if (!player) {
-    alert("Player not found!");
-    return;
-  }
 
   if (!showingOwned) {
     if (map.hasLayer(allAirportsLayer)) map.removeLayer(allAirportsLayer);
     ownedLayer.clearLayers();
 
-    fetch(`http://127.0.0.1:5000/airports/owned/${player}`)
+    fetch(`http://localhost:5000/airports/owned/${player}`)
     .then(res => res.json())
     .then(airports => {
       airports.forEach(airport => {
@@ -127,3 +124,86 @@ toggle1.addEventListener("click", () => {
     showingOwned = false;
   }
 });
+
+
+
+// nappi 2:
+
+const affordableLayer = L.layerGroup();
+
+let showingAffordable = false;
+
+const toggle2 = document.getElementById("toggle2");
+
+toggle2.addEventListener("click", () => {
+
+  if (!showingAffordable) {
+    if (map.hasLayer(allAirportsLayer)) map.removeLayer(allAirportsLayer);
+    if (map.hasLayer(ownedLayer)) map.removeLayer(ownedLayer);
+    affordableLayer.clearLayers();
+
+    fetch(`http://localhost:5000/airports/afford/${player}`)
+    .then(res => res.json())
+    .then(airports => {
+      airports.forEach(airport => {
+        const name = airport[3];
+        const type = airport[2];
+        const lat = parseFloat(airport[4]);
+        const lon = parseFloat(airport[5]);
+        const country = airport[8];
+        const municipality = airport[10];
+        const iata = airport[12];
+        const icao = airport[11];
+
+        if (!isNaN(lat) && !isNaN(lon)) {
+
+          const marker = L.marker([lat, lon]);
+
+          marker.bindPopup(`
+            <b>${name}</b><br>
+            Type: ${type}<br>
+            City: ${municipality}<br>
+            Country: ${country}<br>
+            IATA: ${iata || "N/A"}<br>
+            ICAO: ${icao || "N/A"}<br>
+            Lat: ${lat}<br>
+            Lon: ${lon}
+            
+            <button class="buyBtn">Buy</button>
+          `)
+          marker.on("popupopen", (e) => {
+            const buyBtn = e.popup.getElement().querySelector(".buyBtn");
+            if (buyBtn) {
+              buyBtn.addEventListener("click", () => {
+                alert(`Airport purchased: ${name}`);
+              }, { once: true });
+            }
+          });
+          affordableLayer.addLayer(marker);
+        }
+      });
+
+      if (!map.hasLayer(affordableLayer)) map.addLayer(affordableLayer);
+      showingAffordable = true;
+    })
+    .catch(err => console.error(err));
+
+  } else {
+    affordableLayer.clearLayers();
+    if (!map.hasLayer(allAirportsLayer)) map.addLayer(allAirportsLayer);
+    showingAffordable = false;
+  }
+});
+
+
+
+//pelaajan raha yläpalkkiin:
+
+const moneySpan = document.getElementById("money");
+
+fetch(`http://localhost:5000/money/${player}`)
+.then(res => res.json())
+.then(data => {
+  moneySpan.textContent = data.toLocaleString();
+})
+.catch(err => console.error(err));
