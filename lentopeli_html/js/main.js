@@ -71,6 +71,8 @@ const toggle1 = document.getElementById("toggle1");
 
 const player = getPlayerName();
 
+document.getElementById("player_name").textContent = player;
+
 toggle1.addEventListener("click", () => {
 
   if (!showingOwned) {
@@ -197,13 +199,22 @@ toggle2.addEventListener("click", () => {
 
 
 
-//pelaajan raha yläpalkkiin:
+const moneyEl = document.getElementById("money")
+const profitEl = document.getElementById("profit")
+const timeEl = document.getElementById("time")
 
-const moneySpan = document.getElementById("money");
+async function updateStats() {
+  try {
+    const response = await fetch(`http://localhost:5000/status/${player}`)
+    const data = await response.json()
 
-fetch(`http://localhost:5000/money/${player}`)
-.then(res => res.json())
-.then(data => {
-  moneySpan.textContent = data.toLocaleString();
-})
-.catch(err => console.error(err));
+    moneyEl.textContent = Number(data.money).toLocaleString()
+    profitEl.textContent = Number(data.profit).toLocaleString()
+    timeEl.textContent = data.week
+
+  } catch (error) {
+    console.error("Server not responding:", error)
+  }
+}
+
+setInterval(updateStats, 1000)
