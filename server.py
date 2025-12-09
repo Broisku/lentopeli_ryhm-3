@@ -11,6 +11,9 @@ from functions.add_yield import add_yield
 from functions.constructions import constructions
 from functions.view_own_airports import view_own_airports
 from functions.buy_airport import buy_airport
+from functions.fetchrunway import fetchrunway
+from functions.buy_runway import buy_runway
+from functions.buy_runway import buy_runway
 
 
 app = Flask(__name__)
@@ -227,6 +230,21 @@ def buyairports(player, icao):
     buy_airport(icao, connect, player)
     connect.close()
     return jsonify({'purchased': True})
+
+# Tällä voi hakea monta kiitotietä on saatavilla (huom. tätä routea ei ole vielä käytetty main.js:ssä)
+@app.route('/runways/<player>/<icao>')
+def runways(player, icao):
+    connect = get_connection()
+    return jsonify({'runway': fetchrunway(connect, player, icao)})
+@app.route('/buyrunway/<player>/<icao>')
+def buyrunway(player, icao):
+    connect = get_connection()
+    return jsonify({'purchased': buy_runway(connect, player, icao)})
+@app.route('/buyterminal/<player>/<icao>')
+def buyterminal(player, icao):
+    connect = get_connection()
+    return jsonify({'purchased': buy_runway(connect, player, icao)})
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
