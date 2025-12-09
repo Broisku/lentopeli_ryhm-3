@@ -20,7 +20,7 @@ def buy_terminal(connect, player, icao):
 
     if balance < terminal["cost"]:
         print("You don't have enough money!")
-        return
+        return "You don't have enough money!"
     airport_id = get_airport_id(connect, player, icao)
     cursor.execute("""
                    insert into player_terminal (player_airports_id, terminal_types_id, construction_weeks_left)
@@ -30,3 +30,4 @@ def buy_terminal(connect, player, icao):
     print("Terminal purchase successful!")
     connect.commit()
     cursor.close()
+    return "Terminal purchase successful!"

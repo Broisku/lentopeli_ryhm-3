@@ -21,7 +21,8 @@ def buy_runway(connect, player, icao):
 
     if balance < runway["cost"]:
         print("You don't have enough money!")
-        return
+        cursor.close()
+        return "You don't have enough money!"
 
     airport_id = get_airport_id(connect, player, icao)
     cursor = connect.cursor()
@@ -32,3 +33,4 @@ def buy_runway(connect, player, icao):
     print("Runway purchase successful!")
     connect.commit()
     cursor.close()
+    return "Runway purchase successful!"
