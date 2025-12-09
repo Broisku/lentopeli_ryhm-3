@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="images/dreamstime_xxl_396595653.jpg" rel="preload" as="image" fetchpriority="high">
     <link href="css/style_index_new.css" rel="stylesheet">
     <title>Airport Tycoon :: New game</title>
     <script src="js/new_game.js" defer></script>
 </head>
 <body>
+<img
+    src="images/dreamstime_xxl_396595653.jpg"
+    alt="background img"
+    class="background-img"
+    fetchpriority="high"
+    loading="eager"
+    decoding="async">
 <main class="menu">
     <header>
-    <h1>Airport Tycoon</h1>
+    <h1 class="mainheader">Airport Tycoon</h1>
 </header>
 <form id="name-form" action="game.html">
-    <label for="new-player">Enter your name:</label>
+    <label id="label" for="new-player">Enter your name:</label>
     <input id="new-player" name="name" type="text">
-    <input name="submit" type="submit" value="Start">
+    <input id="submit" name="submit" type="submit" value="Start" style="font-family: BungeeSpice-Regular, sans-serif">
 </form>
 </main>
 </body>
