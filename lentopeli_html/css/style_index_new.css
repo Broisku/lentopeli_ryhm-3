@@ -39,6 +39,7 @@ li a {
     font-size: large;
     text-decoration: none;
     color: black;
+    cursor: pointer;
 }
 
 #name-form {
