@@ -10,6 +10,7 @@ from functions.check_week import check_week
 from functions.add_yield import add_yield
 from functions.constructions import constructions
 from functions.view_own_airports import view_own_airports
+from functions.buy_airport import buy_airport
 
 
 app = Flask(__name__)
@@ -220,7 +221,12 @@ def afford_airports(player):
         connect.close()
         return jsonify(airports)
 
-
+@app.route('/buyairports/<player>/<icao>')
+def buyairports(player, icao):
+    connect = get_connection()
+    buy_airport(icao, connect, player)
+    connect.close()
+    return jsonify({'purchased': True})
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
