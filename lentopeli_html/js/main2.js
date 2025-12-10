@@ -146,8 +146,8 @@ toggle1.addEventListener('click', () => {
                 <div class="popup-left">
                   <h3>${name}, ${country}</h3>
                   <p><b>Size:</b> ${size}</p>
-                  <p><b>Terminals:</b> ${ownedTerminals} / ${maxTerminals}
-                    <button class="terminalBtn ${termBtnClass}">${termBtnLabel}</button>
+                  <p><b>Terminals:</b> <span id="owned-terminals">${ownedTerminals}</span> / ${maxTerminals}
+                    <button class="terminalBtn ${termBtnClass}"><span id="terBtnLabel">${termBtnLabel}</span></button>
                   </p>
                 </div>
 
@@ -169,31 +169,54 @@ toggle1.addEventListener('click', () => {
                   if (runBtn && !runBtn.classList.contains('disabled')) {
                     runBtn.addEventListener('click', async () => {
                       if (!runBtn.classList.contains('disabled')) {
-                        await fetch(
-                          `http://localhost:5000/buyrunway/${player}/${icao}`,
-                          {method: 'POST'});
-
-                        const ownedRun = popupEl.querySelector('#owned-runways');
-                        const currentRun = parseInt(ownedRun.textContent);
-                        if (currentRun < maxRunways) {
-                          ownedRun.textContent = `${currentRun + 1}`;
-                        }
-                        if (parseInt(ownedRun.textContent) === maxRunways) {
-                          runBtn.querySelector(
-                              '#runBtnLabel').textContent = 'Owned';
-                          runBtn.classList.add('disabled');
-                        }
+                        fetch(
+                            `http://localhost:5000/buyrunway/${player}/${icao}`).
+                            then(res => res.json()).then(result => {
+                          if (result.purchased !==
+                              'You don\'t have enough money!') {
+                            const ownedRun = popupEl.querySelector(
+                                '#owned-runways');
+                            const currentRun = parseInt(ownedRun.textContent);
+                            if (currentRun < maxRunways) {
+                              ownedRun.textContent = `${currentRun + 1}`;
+                            }
+                            if (parseInt(ownedRun.textContent) === maxRunways) {
+                              runBtn.querySelector(
+                                  '#runBtnLabel').textContent = 'Owned';
+                              runBtn.classList.add('disabled');
+                            }
+                          } else {
+                            alert(result.purchased);
+                          }
+                        });
                       }
-
 
                     });
                   }
 
                   if (termBtn && !termBtn.classList.contains('disabled')) {
                     termBtn.addEventListener('click', async () => {
-                      await fetch(
-                          `http://localhost:5000/buyterminal/${player}/${icao}`,
-                          {method: 'POST'});
+                      if (!termBtn.classList.contains('disabled')) {
+                        fetch(
+                            `http://localhost:5000/buyterminal/${player}/${icao}`).
+                            then(res => res.json()).then(result => {
+                          if (result.purchased !==
+                              'You don\'t have enough money!') {
+                            const ownedTer = popupEl.querySelector('#owned-terminals');
+                            const currentTer = parseInt(ownedTer.textContent);
+                            if (currentTer < maxTerminals) {
+                              ownedTer.textContent = `${currentTer + 1}`;
+                            }
+                            if (parseInt(ownedTer.textContent) === maxTerminals) {
+                              termBtn.querySelector(
+                                  '#terBtnLabel').textContent = 'Owned';
+                              termBtn.classList.add('disabled');
+                            }
+                          } else {
+                            alert(result.purchased);
+                          }
+                        });
+                      }
                     });
                   }
                 });
