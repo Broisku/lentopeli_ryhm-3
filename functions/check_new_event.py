@@ -3,7 +3,6 @@
 import random
 
 def check_new_event(connect, player):
-    return 1, "otsikko", "kuvaus"
 
     # tarkastetaan, onko pelaajalla tällä hetkellä eventtiä, jos on niin poistutaan funktiosta
     cursor = connect.cursor(buffered=True)
@@ -17,7 +16,7 @@ def check_new_event(connect, player):
     if result is not None:
         return 0
 
-    luku = random.randint(1, 25)
+    luku = random.randint(1, 5)
 
     if luku > 5:
         return 0

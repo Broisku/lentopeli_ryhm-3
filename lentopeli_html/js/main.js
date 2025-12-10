@@ -43,6 +43,7 @@ fetch('http://localhost:5000/airports').
           `);
 
           allAirportsLayer.addLayer(marker);
+          console.log('Owned airports loaded:', airports);
 
           marker.on('popupopen', (e) => {
             const btn = e.popup.getElement().querySelector('.buyBtn');
@@ -291,6 +292,8 @@ setTimeout(updateStats, 1000);
 
 // pause nappi
 
+const pauseBtn = document.getElementById('pause');
+let isPaused = false;
 
 pauseBtn.addEventListener('click', async () => {
   // pause
