@@ -148,7 +148,7 @@ toggle1.addEventListener('click', () => {
                   </p>
                 </div>
               </div>
-            `);
+            `, {maxWidth:800});
 
             marker.on('popupopen', (e) => {
               const popupEl = e.popup.getElement();
@@ -325,4 +325,5 @@ speedBtn.addEventListener('click', () => {
 
     fetch('http://localhost:5000/set_speed/normal');
   }
+
 });
