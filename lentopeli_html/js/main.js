@@ -359,21 +359,15 @@ async function updateStats() {
 
     moneyEl.textContent = Number(data.money).toLocaleString();
     profitEl.textContent = Number(data.profit).toLocaleString();
-    timeEl.textContent = data.week;
+    timeEl.textContent = Number(data.week).toLocaleString();
 
   } catch (error) {
     console.error('Server not responding:', error);
   }
 }
 
-async function tickPoll() {
-  if (!isPaused) {
-    await checkRunningEvent();
-    await checkNewEvent();
-  }
-}
 
-setTimeout(updateStats, 1000);
+setInterval(updateStats, 1000);
 
 // pause nappi
 
@@ -422,6 +416,13 @@ speedBtn.addEventListener('click', () => {
   }
 
 });
+
+async function tickPoll() {
+  if (!isPaused) {
+    await checkRunningEvent();
+    await checkNewEvent();
+  }
+}
 
 if (slowMode) {
   setInterval(tickPoll, 10000);
