@@ -316,6 +316,8 @@ async function checkNewEvent() {
 
         }
 
+    }catch(err) {
+        console.error('Server not responding:', err);
     }
 }
 
