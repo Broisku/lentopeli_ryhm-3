@@ -12,6 +12,8 @@ const allAirportsLayer = L.layerGroup().addTo(map);
 fetch('http://localhost:5000/airports').
     then(res => res.json()).
     then(airports => {
+      console.log('Owned airports loaded:', airports);
+
       airports.forEach(airport => {
 
         const name = airport[3];
@@ -41,7 +43,6 @@ fetch('http://localhost:5000/airports').
           `);
 
           allAirportsLayer.addLayer(marker);
-          console.log('Owned airports loaded:', airports);
 
           marker.on('popupopen', (e) => {
             const btn = e.popup.getElement().querySelector('.buyBtn');
@@ -65,6 +66,10 @@ function getPlayerName() {
 const ownedLayer = L.layerGroup();
 
 let showingOwned = false;
+
+let isPaused = false;
+const pauseBtn = document.getElementById('pause');
+
 
 const toggle1 = document.getElementById('toggle1');
 
@@ -275,55 +280,17 @@ async function updateStats() {
   }
 }
 
-setInterval(updateStats, 1000);
-
-
-
-// tarkastaa jos eventti on päättynyt, jos on tulee alertti siitä
-
-async function checkRunningEvent() {
-    try {
-        const response = await fetch(`http://localhost:5000/running_event/${player}/`);
-        const data = await response.json();
-
-        if (data === 2) {
-            alert('Event has finished.')
-        }
-    } catch (error) {
-        console.error('Server not responding:', error);
-    }
+async function tickPoll() {
+  if (!isPaused) {
+    await checkRunningEvent();
+    await checkNewEvent();
+  }
 }
 
-setInterval(checkRunningEvent, 1000);
-
-
-
-const dialog = document.querySelector('dialog');
-const img = document.querySelector('img');
-
-// tarkastaa onko uutta eventtiä, jos on tulee showmodali siitä
-
-async function checkNewEvent() {
-    try {
-        const response = await fetch(`http://localhost:5000/new_event/${player}/`);
-        const data = await response.json();
-
-        if (data !== 0) {
-            if (data[0] === 1) {
-                img.src = images/meteorite.jpeg
-
-            }
-
-        }
-
-    }
-}
-
+setTimeout(updateStats, 1000);
 
 // pause nappi
 
-const pauseBtn = document.getElementById('pause');
-let isPaused = false;
 
 pauseBtn.addEventListener('click', async () => {
   // pause
@@ -370,3 +337,10 @@ speedBtn.addEventListener('click', () => {
   }
 
 });
+
+if (slowMode) {
+  setInterval(tickPoll, 10000);
+}
+else {
+  setInterval(tickPoll, 3000);
+}
