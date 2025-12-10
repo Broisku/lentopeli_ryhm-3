@@ -232,3 +232,55 @@ body {
   background: #ffe08c;
   border-color: #c27d00;
 }
+
+dialog {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #3e3d3c;
+    border-radius: 0.3rem;
+    padding: 1rem 2rem;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    width: 40rem;
+    z-index: 9999;
+    margin: 0;
+}
+
+dialog[open] {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+
+dialog::backdrop {
+    background: rgb(0 0 0 / 0.8);
+}
+
+dialog span {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    font-size: 2rem;
+    text-decoration: none;
+    color: #fff;
+    filter: drop-shadow(2px 2px 2px #000);
+}
+
+dialog img {
+    width: 500px;
+    height: 500px;
+    border-radius: 0.3rem;
+    border: 2px solid black;
+    object-fit: cover;
+    object-position: center;
+}
+dialog p {
+    color: white;
+}
+dialog h2 {
+    color: white;
+}
