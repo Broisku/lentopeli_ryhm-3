@@ -13,7 +13,8 @@ from functions.view_own_airports import view_own_airports
 from functions.buy_airport import buy_airport
 from functions.fetchrunway import fetchrunway
 from functions.buy_runway import buy_runway
-from functions.buy_runway import buy_runway
+from functions.check_running_event import check_running_event
+from functions.check_new_event import check_new_event
 
 
 app = Flask(__name__)
@@ -108,6 +109,8 @@ def game_loop():
 
             constructions(connect)
             add_yield(connect, player_name)
+            check_running_event(connect, player_name)
+            check_new_event(connect, player_name)
 
             connect.close()
 
@@ -244,6 +247,19 @@ def buyrunway(player, icao):
 def buyterminal(player, icao):
     connect = get_connection()
     return jsonify({'purchased': buy_runway(connect, player, icao)})
+
+
+@app.route('/new_event/<player>/')
+def if_new_event(player):
+    connect = get_connection()
+    new_event = check_new_event(connect, player)
+    return jsonify(new_event)
+
+@app.route('/running_event/<player>/')
+def if_running_event(player):
+    connect = get_connection()
+    running_event = check_running_event(connect, player)
+    return jsonify(running_event)
 
 
 if __name__ == '__main__':

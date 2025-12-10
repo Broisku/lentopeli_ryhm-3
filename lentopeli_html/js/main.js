@@ -277,6 +277,49 @@ async function updateStats() {
 
 setInterval(updateStats, 1000);
 
+
+
+// tarkastaa jos eventti on päättynyt, jos on tulee alertti siitä
+
+async function checkRunningEvent() {
+    try {
+        const response = await fetch(`http://localhost:5000/running_event/${player}/`);
+        const data = await response.json();
+
+        if (data === 2) {
+            alert('Event has finished.')
+        }
+    } catch (error) {
+        console.error('Server not responding:', error);
+    }
+}
+
+setInterval(checkRunningEvent, 1000);
+
+
+
+const dialog = document.querySelector('dialog');
+const img = document.querySelector('img');
+
+// tarkastaa onko uutta eventtiä, jos on tulee showmodali siitä
+
+async function checkNewEvent() {
+    try {
+        const response = await fetch(`http://localhost:5000/new_event/${player}/`);
+        const data = await response.json();
+
+        if (data !== 0) {
+            if (data[0] === 1) {
+                img.src = images/meteorite.jpeg
+
+            }
+
+        }
+
+    }
+}
+
+
 // pause nappi
 
 const pauseBtn = document.getElementById('pause');

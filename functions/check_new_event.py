@@ -3,6 +3,7 @@
 import random
 
 def check_new_event(connect, player):
+    return 1, "otsikko", "kuvaus"
 
     # tarkastetaan, onko pelaajalla tällä hetkellä eventtiä, jos on niin poistutaan funktiosta
     cursor = connect.cursor(buffered=True)
@@ -14,12 +15,12 @@ def check_new_event(connect, player):
                    """, (player,))
     result = cursor.fetchone()
     if result is not None:
-        return
+        return 0
 
     luku = random.randint(1, 25)
 
     if luku > 5:
-        return
+        return 0
 
     else:
         cursor.execute("select * from event_types")
@@ -38,13 +39,13 @@ def check_new_event(connect, player):
             """, (player,))
             result = cursor.fetchone()
             if result is None:
-                return # pelaajalla ei ole yhtäkään kiitorataa
+                return 0 # pelaajalla ei ole yhtäkään kiitorataa
 
 
             status = result[0]
             if status == "under_construction":
                 cursor.close()
-                return # meteoriitti ei iske kiitorataan joka ei ole vielä valmis
+                return 0 # meteoriitti ei iske kiitorataan joka ei ole vielä valmis
 
             org_yield = result[1]
 
@@ -78,10 +79,7 @@ def check_new_event(connect, player):
             selite = eventti[0][2]
 
             # printataan pelaajalle mitä tapahtui
-            print("")
-            print(otsikko)
-            print("")
-            print(selite)
+            return 1, otsikko, selite
 
 
         elif luku == 2:
@@ -98,12 +96,12 @@ def check_new_event(connect, player):
                            """, (player,))
             result = cursor.fetchone()
             if result is None:
-                return  # pelaajalla ei ole yhtäkään kiitorataa
+                return  0 # pelaajalla ei ole yhtäkään kiitorataa
 
             status = result[0]
             if status == "under_construction":
                 cursor.close()
-                return  # ei voi olla turistirysää jos ei ole kiitorata valmis
+                return  0 # ei voi olla turistirysää jos ei ole kiitorata valmis
 
             org_yield = result[1]
 
@@ -139,10 +137,7 @@ def check_new_event(connect, player):
             selite = eventti[1][2]
 
             # printataan pelaajalle mitä tapahtui
-            print("")
-            print(otsikko)
-            print("")
-            print(selite)
+            return 2, otsikko, selite
 
 
 
@@ -161,12 +156,12 @@ def check_new_event(connect, player):
                            """, (player,))
             result = cursor.fetchone()
             if result is None:
-                return  # pelaajalla ei ole yhtäkään kiitorataa
+                return 0 # pelaajalla ei ole yhtäkään kiitorataa
 
             status = result[0]
             if status == "under_construction":
                 cursor.close()
-                return  # ei vaikuta kiitorataan joka ei ole vielä valmis
+                return 0 # ei vaikuta kiitorataan joka ei ole vielä valmis
 
             org_yield = result[1]
 
@@ -200,10 +195,7 @@ def check_new_event(connect, player):
             selite = eventti[2][2]
 
             # printataan pelaajalle mitä tapahtui
-            print("")
-            print(otsikko)
-            print("")
-            print(selite)
+            return 3, otsikko, selite
 
 
 
@@ -222,12 +214,12 @@ def check_new_event(connect, player):
                            """, (player,))
             result = cursor.fetchone()
             if result is None:
-                return  # pelaajalla ei ole yhtäkään terminaalia
+                return 0 # pelaajalla ei ole yhtäkään terminaalia
 
             status = result[0]
             if status == "under_construction":
                 cursor.close()
-                return  # ei vaikuta terminaaliin joka ei ole vielä valmis
+                return 0 # ei vaikuta terminaaliin joka ei ole vielä valmis
 
             org_yield = result[1]
 
@@ -262,10 +254,7 @@ def check_new_event(connect, player):
             selite = eventti[3][2]
 
             # printataan pelaajalle mitä tapahtui
-            print("")
-            print(otsikko)
-            print("")
-            print(selite)
+            return 4, otsikko, selite
 
 
 
@@ -284,12 +273,12 @@ def check_new_event(connect, player):
                            """, (player,))
             result = cursor.fetchone()
             if result is None:
-                return  # pelaajalla ei ole yhtäkään kiitorataa
+                return 0 # pelaajalla ei ole yhtäkään kiitorataa
 
             status = result[0]
             if status == "under_construction":
                 cursor.close()
-                return  # ei voi laskeutua kiitoradalle, joka ei ole vielä valmis
+                return 0 # ei voi laskeutua kiitoradalle, joka ei ole vielä valmis
 
 
             cursor.execute("update game set money = money + 1000000 where name = %s",(player,))
@@ -299,11 +288,7 @@ def check_new_event(connect, player):
             selite = eventti[4][2]
 
             # printataan pelaajalle mitä tapahtui
-            print("")
-            print(otsikko)
-            print("")
-            print(selite)
-
+            return 5, otsikko, selite
 
     connect.commit()
     cursor.close()

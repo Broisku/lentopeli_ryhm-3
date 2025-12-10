@@ -11,7 +11,7 @@ def check_running_event(connect, player):
                    """, (player,))
     result = cursor.fetchone()
     if result is None:
-        return # ei ole mitään, niin poistutaan funktiosta
+        return 0 # ei ole mitään, niin poistutaan funktiosta
 
     else: #tarkistetaan, kuinka monta viikkoa enää jäljellä
         cursor.execute("""
@@ -93,6 +93,10 @@ def check_running_event(connect, player):
             cursor.execute("""
                            delete from player_events where game_id in (select id from game where name = %s)
                            """, (player,))
+
+            return 2
+
+        return 1
 
 
     connect.commit()
