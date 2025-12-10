@@ -12,9 +12,9 @@ def get_airport_cost(icao, connect):
         if airport_type == "small_airport":
             airport_cost = 3_000_000
         elif airport_type == "medium_airport":
-            airport_cost = 6_000_000
+            airport_cost = 8_000_000
         else:
-            airport_cost = 12_000_000
+            airport_cost = 15_000_000
         return airport_cost
     finally:
         if cursor:

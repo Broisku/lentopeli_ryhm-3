@@ -44,7 +44,7 @@ player_name = None
 
 # luodaan pelaaja:
 
-def create_game(connect, player_name, money=10_000_000, week=0):
+def create_game(connect, player_name, money=7_000_000, week=0):
     cursor = connect.cursor()
     cursor.execute(
         "INSERT INTO game (name, money, time) VALUES (%s, %s, %s)",
