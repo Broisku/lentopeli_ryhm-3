@@ -86,7 +86,6 @@ toggle1.addEventListener('click', () => {
           then(airports => {
 
             airports.forEach(airport => {
-
               const type = airport[0];
               const name = airport[1];
               const icao = airport[3];
@@ -108,16 +107,22 @@ toggle1.addEventListener('click', () => {
               else size = 'large airport';
 
               let maxRunways, maxTerminals;
-
+              let con_time, cost;
               if (type === 'small_airport') {
                 maxRunways = 2;
                 maxTerminals = 1;
+                con_time = "<b>Construction time:</b> 12 weeks";
+                cost = "<b>Cost:</b> 3,000,000";
               } else if (type === 'medium_airport') {
                 maxRunways = 3;
                 maxTerminals = 2;
+                con_time = "<b>Construction time:</b> 12 weeks";
+                cost = "<b>Cost:</b> 6,000,000";
               } else {
                 maxRunways = 4;
                 maxTerminals = 3;
+                con_time = "<br>Construction time:</br> 12 weeks";
+                cost = "<b>Cost:</b> 9,000,000";
               }
 
               const ownedRunways = runways || 0;
@@ -137,6 +142,7 @@ toggle1.addEventListener('click', () => {
                   '' :
                   'disabled';
 
+
               if (!isNaN(lat) && !isNaN(lon)) {
 
                 const marker = L.marker([lat, lon]);
@@ -147,6 +153,8 @@ toggle1.addEventListener('click', () => {
                   <h3>${name}, ${country}</h3>
                   <p><b>Size:</b> ${size}</p>
                   <p><b>Terminals:</b> <span id="owned-terminals">${ownedTerminals}</span> / ${maxTerminals}
+                    <span id="ter-con-time">${con_time}</span><br>
+                    <span id="ter-cost">${cost}</span><br>
                     <button class="terminalBtn ${termBtnClass}"><span id="terBtnLabel">${termBtnLabel}</span></button>
                   </p>
                 </div>
@@ -155,6 +163,8 @@ toggle1.addEventListener('click', () => {
                   <p><b>${iata || 'N/A'} / ${icao || 'N/A'}</b></p>
                   <p><b>Profit:</b> ${profit || 0}</p>
                   <p><b>Runways:</b> <span id="owned-runways">${ownedRunways}</span> / ${maxRunways}
+                    <span id="run-con-time">${con_time}</span><br>
+                    <span id="run-cost">${cost}</span><br>
                     <button class="runwayBtn ${runwayBtnClass}"><span id="runBtnLabel">${runwayBtnLabel}</span></button>
                   </p>
                 </div>
@@ -162,9 +172,19 @@ toggle1.addEventListener('click', () => {
             `, {maxWidth: 800});
 
                 marker.on('popupopen', (e) => {
+
                   const popupEl = e.popup.getElement();
                   const runBtn = popupEl.querySelector('.runwayBtn');
                   const termBtn = popupEl.querySelector('.terminalBtn');
+
+                  if (ownedRunways === maxRunways) {
+                    popupEl.querySelector('#run-con-time').remove();
+                    popupEl.querySelector('#run-cost').remove();
+                  }
+                  if (ownedTerminals === maxTerminals) {
+                    popupEl.querySelector('#ter-con-time').remove();
+                    popupEl.querySelector('#ter-cost').remove();
+                  }
 
                   if (runBtn && !runBtn.classList.contains('disabled')) {
                     runBtn.addEventListener('click', async () => {
@@ -183,6 +203,8 @@ toggle1.addEventListener('click', () => {
                             if (parseInt(ownedRun.textContent) === maxRunways) {
                               runBtn.querySelector(
                                   '#runBtnLabel').textContent = 'Owned';
+                              popupEl.querySelector('#run-con-time').remove();
+                              popupEl.querySelector('#run-cost').remove();
                               runBtn.classList.add('disabled');
                             }
                           } else {
@@ -210,6 +232,8 @@ toggle1.addEventListener('click', () => {
                             if (parseInt(ownedTer.textContent) === maxTerminals) {
                               termBtn.querySelector(
                                   '#terBtnLabel').textContent = 'Owned';
+                              popupEl.querySelector('#ter-con-time').remove();
+                              popupEl.querySelector('#ter-cost').remove();
                               termBtn.classList.add('disabled');
                             }
                           } else {
@@ -222,7 +246,6 @@ toggle1.addEventListener('click', () => {
                 });
 
                 marker.on('popupclose', (e) => {
-                  console.log('popupclose');
                   ownedLayer.clearLayers();
                   fetchOwned(ownedUrl);
                 });
