@@ -236,11 +236,11 @@ def buyairports(player, icao):
 def runways(player, icao):
     connect = get_connection()
     return jsonify({'runway': fetchrunway(connect, player, icao)})
-@app.route('/buyrunway/<player>/<icao>')
+@app.route('/buyrunway/<player>/<icao>', methods=['POST'])
 def buyrunway(player, icao):
     connect = get_connection()
     return jsonify({'purchased': buy_runway(connect, player, icao)})
-@app.route('/buyterminal/<player>/<icao>')
+@app.route('/buyterminal/<player>/<icao>', methods=['POST'])
 def buyterminal(player, icao):
     connect = get_connection()
     return jsonify({'purchased': buy_runway(connect, player, icao)})

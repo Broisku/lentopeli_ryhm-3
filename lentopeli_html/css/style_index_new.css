@@ -8,6 +8,21 @@
 .mainheader {
     font-family: BungeeSpice-Regular, serif;
     font-size: 50px;
+    color: orange;
+
+    text-shadow:
+        -2px -2px 0 black,
+         2px -2px 0 black,
+        -2px  2px 0 black,
+         2px  2px 0 black,
+
+        0 0 2px black,
+        0 0 3px black,
+        0 0 4px black;
+}
+
+.mainheader:hover {
+    cursor: default;
 }
 
 body {
@@ -40,20 +55,65 @@ li a {
     text-decoration: none;
     color: black;
     cursor: pointer;
+
+    text-shadow:
+        -1px -1px 0 black,
+         1px -1px 0 black,
+        -1px  1px 0 black,
+         1px  1px 0 black,
+
+        0 0 1px black,
+        0 0 2px black,
+        0 0 3px black;
+
+}
+
+li a:hover {
+    background-color: navajowhite;
 }
 
 #name-form {
     display: flex;
     flex-direction: column;
-    background-color: linen;
+    background-color: transparent;
+    gap: 1rem;
+    width: 16rem;
+    margin: auto;
+
+    text-shadow:
+        -1px -1px 0 black,
+         1px -1px 0 black,
+        -1px  1px 0 black,
+         1px  1px 0 black,
+
+        0 0 1px black,
+        0 0 2px black,
+        0 0 3px black;
 }
 
 #new-player {
-    background-color: linen;
+    background-color: blanchedalmond;
 }
 #submit {
-    background-color: linen;
+    background-color: blanchedalmond;
+    width: 8rem;
+    height: 2.5rem;
+    margin: 1rem auto;
+    cursor: pointer;
 
+    text-shadow:
+        -1px -1px 0 black,
+         1px -1px 0 black,
+        -1px  1px 0 black,
+         1px  1px 0 black,
+
+        0 0 1px black,
+        0 0 2px black,
+        0 0 3px black;
+}
+
+#submit:hover {
+    background-color: mediumseagreen;
 }
 
 .background-img {
@@ -65,7 +125,8 @@ li a {
     z-index: -1;
 }
 
-nav {
-    background-color: linen;
+.mainnav {
+    background-color: blanchedalmond;
     padding: 1rem;
+    outline: black solid 2px;
 }

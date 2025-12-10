@@ -78,46 +78,105 @@ toggle1.addEventListener('click', () => {
     if (map.hasLayer(allAirportsLayer)) map.removeLayer(allAirportsLayer);
     ownedLayer.clearLayers();
 
-    fetch(`http://localhost:5000/airports/owned/${player}`).
-        then(res => res.json()).
-        then(airports => {
-          airports.forEach(airport => {
-            const type = airport[0];
-            const name = airport[1];
-            const municipality = airport[2];
-            const icao = airport[3];
-            const iata = airport[4];
-            const lat = parseFloat(airport[6]);
-            const lon = parseFloat(airport[7]);
+    fetch(`http://localhost:5000/airports/owned/${player}`)
+      .then(res => res.json())
+      .then(airports => {
 
-            if (!isNaN(lat) && !isNaN(lon)) {
-              const marker = L.marker([lat, lon]);
-              marker.bindPopup(`
-              <b>${name}</b><br>
-              Type: ${type}<br>
-              City: ${municipality}<br>
-              IATA: ${iata || 'N/A'}<br>
-              ICAO: ${icao}<br>
-              Lat: ${lat}<br>
-              Lon: ${lon}
-              <button class="runwayBtn">Buy runway</button>
+        airports.forEach(airport => {
+
+          const type = airport[0];
+          const name = airport[1];
+          const icao = airport[3];
+          const iata = airport[4];
+          const lat = parseFloat(airport[6]);
+          const lon = parseFloat(airport[7]);
+          const profit = parseFloat(airport[8]);
+          const country = airport[9];
+          const runways = airport[10];
+          const runway_construction = airport[11];
+          const runway_state = airport[12];
+          const terminals = airport[13];
+          const terminals_construction = airport[14];
+          const terminals_state = airport[15];
+
+          let size;
+          if (type === 'small_airport') size = 'small airport';
+          else if (type === 'medium_airport') size = 'medium airport';
+          else size = 'large airport';
+
+          let maxRunways, maxTerminals;
+
+          if (type === 'small_airport') {
+            maxRunways = 2;
+            maxTerminals = 1;
+          } else if (type === 'medium_airport') {
+            maxRunways = 3;
+            maxTerminals = 2;
+          } else {
+            maxRunways = 4;
+            maxTerminals = 3;
+          }
+
+          const ownedRunways = runways || 0;
+          const ownedTerminals = terminals || 0;
+
+          const runwayBtnLabel = ownedRunways < maxRunways ? "Buy" : "Owned";
+          const runwayBtnClass = ownedRunways < maxRunways ? "" : "disabled";
+
+          const termBtnLabel = ownedTerminals < maxTerminals ? "Buy" : "Owned";
+          const termBtnClass = ownedTerminals < maxTerminals ? "" : "disabled";
+
+          if (!isNaN(lat) && !isNaN(lon)) {
+
+            const marker = L.marker([lat, lon]);
+
+            marker.bindPopup(`
+              <div class="airport-popup">
+                <div class="popup-left">
+                  <h3>${name}, ${country}</h3>
+                  <p><b>Size:</b> ${size}</p>
+                  <p><b>Terminals:</b> ${ownedTerminals} / ${maxTerminals}
+                    <button class="terminalBtn ${termBtnClass}">${termBtnLabel}</button>
+                  </p>
+                </div>
+
+                <div class="popup-right">
+                  <p><b>${iata || 'N/A'} / ${icao || 'N/A'}</b></p>
+                  <p><b>Profit:</b> ${profit || 0}</p>
+                  <p><b>Runways:</b> ${ownedRunways} / ${maxRunways}
+                    <button class="runwayBtn ${runwayBtnClass}">${runwayBtnLabel}</button>
+                  </p>
+                </div>
+              </div>
             `);
-              marker.on('popupopen', (e) => {
-                const btn = e.popup.getElement().querySelector('.runwayBtn');
-                if (btn) {
-                  btn.addEventListener('click', () => {
-                    alert(`Runway purchased for airport: ${name}`);
-                  }, {once: true});
-                }
-              });
-              ownedLayer.addLayer(marker);
-            }
-          });
 
-          if (!map.hasLayer(ownedLayer)) map.addLayer(ownedLayer);
-          showingOwned = true;
-        }).
-        catch(err => console.error(err));
+            marker.on('popupopen', (e) => {
+              const popupEl = e.popup.getElement();
+              const runBtn = popupEl.querySelector('.runwayBtn');
+              const termBtn = popupEl.querySelector('.terminalBtn');
+
+              if (runBtn && !runBtn.classList.contains('disabled')) {
+                runBtn.addEventListener('click', async () => {
+                  await fetch(`/buyrunway/${player}/${icao}`, { method: 'POST' });
+                });
+              }
+
+              if (termBtn && !termBtn.classList.contains('disabled')) {
+                termBtn.addEventListener('click', async () => {
+                  await fetch(`/buyterminal/${player}/${icao}`, { method: 'POST' });
+                });
+              }
+            });
+
+            ownedLayer.addLayer(marker);
+          }
+        });
+
+        if (!map.hasLayer(ownedLayer)) map.addLayer(ownedLayer);
+        showingOwned = true;
+
+      })
+      .catch(err => console.error(err));
 
   } else {
     ownedLayer.clearLayers();
@@ -125,6 +184,7 @@ toggle1.addEventListener('click', () => {
     showingOwned = false;
   }
 });
+
 
 // nappi 2:
 

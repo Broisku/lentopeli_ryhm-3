@@ -158,3 +158,77 @@ body {
     cursor: pointer;
     border-radius: 6px;
 }
+
+.airport-popup {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 280px;
+    font-family: Arial, sans-serif;
+}
+
+.popup-left, .popup-right {
+    width: 50%;
+}
+
+.popup-left h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.airport-popup p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.airport-popup button {
+    margin-left: 5px;
+    padding: 3px 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+
+.airport-popup {
+  display: flex;
+  background: #e6e6e6;
+  padding: 12px;
+  border-radius: 8px;
+  gap: 20px;
+  font-family: Arial, sans-serif;
+  width: 320px;
+}
+
+.popup-left, .popup-right {
+  flex: 1;
+}
+
+.airport-popup h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.airport-popup p {
+  margin: 4px 0;
+}
+
+.square-btn {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.square-btn.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.square-btn.construction {
+  background: #ffe08c;
+  border-color: #c27d00;
+}
