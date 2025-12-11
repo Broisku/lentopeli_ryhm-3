@@ -71414,15 +71414,20 @@ foreign key (event_types_id) references event_types(id)
 );
 
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
-values (0, 1500, 3000000, 12, 20000, 60000);
+values (0, 1500, 1500000, 12, 20000, 60000);
+
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
-values (1, 3000, 6000000, 24, 40000, 120000);
+values (1, 3000, 3000000, 24, 40000, 120000);
+
 insert into runway_types(id, length, cost, construction_time, operating_cost, yield)
-values (2, 4500, 9000000, 36, 60000, 180000);
+values (2, 4500, 4500000, 36, 60000, 180000);
+
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
-values (0, "small", 3000000, 12, 20000, 60000);
+values (0, "small", 1500000, 12, 20000, 60000);
+
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
 values (1, "medium", 6000000, 24, 40000, 120000);
+
 insert into terminal_types(id, size, cost, construction_time, operating_cost, yield)
 values (2, "large", 12000000, 48, 80000, 240000);
 
