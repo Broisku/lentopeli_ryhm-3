@@ -1,293 +1,90 @@
-# tämä funktio arpoo, että tuleeko eventtiä, jos tulee se asettaa eventin vaikutukset tietokantaan
-
 import random
 
-def check_new_event(connect, player):
 
-    # tarkastetaan, onko pelaajalla tällä hetkellä eventtiä, jos on niin poistutaan funktiosta
+def check_new_event(connect, player):
     cursor = connect.cursor(buffered=True)
+
     cursor.execute("""
-                   select player_events.id
-                   from player_events
-                            inner join game on player_events.game_id = game.id
-                   where game.name = %s
+                   SELECT pe.id
+                   FROM player_events pe
+                            JOIN game g ON pe.game_id = g.id
+                   WHERE g.name = %s
                    """, (player,))
-    result = cursor.fetchone()
-    if result is not None:
+
+    if cursor.fetchone():
         return 0
 
-    luku = random.randint(1, 5)
+
+    luku = random.randint(1, 80)
 
     if luku > 5:
         return 0
 
-    else:
-        cursor.execute("select * from event_types")
-        eventti = cursor.fetchall()
 
-        if luku == 1:
-
-            # haetaan kiitoradan status ja yieldi
-
-            cursor.execute("""
-                    select status, yield from player_runway inner join player_airports 
-                    on player_runway.player_airports_id = player_airports.id
-                    inner join game on player_airports.game_id = game.id
-                    where game.name = %s
-                    limit 1
-            """, (player,))
-            result = cursor.fetchone()
-            if result is None:
-                return 0 # pelaajalla ei ole yhtäkään kiitorataa
-
-
-            status = result[0]
-            if status == "under_construction":
-                cursor.close()
-                return 0 # meteoriitti ei iske kiitorataan joka ei ole vielä valmis
-
-            org_yield = result[1]
-
-            # talletetaan alkuperäinen yieldi sekä event_id tietokantaan
-            cursor.execute("""
-                           insert into player_events(game_id, original_yield, event_types_id)
-                           values ((select id from game where game.name = %s), %s, %s)
-                           """, (player, org_yield, 0))
-
-
-            # päivitetään tietokantaan eventin pituus
-
-            cursor.execute(""" 
-                            update player_events inner join game on game_id = game.id
-                           set event_weeks_left = 8
-                           where game.name = %s
-                                limit 1
-                            """,(player,))
-
-
-
-            # sitten itse efekti: kiitoradan yieldi -75 000
-            cursor.execute("""update player_runway 
-                    inner join player_airports on player_runway.player_airports_id = player_airports.id 
-                    inner join game on player_airports.game_id = game.id 
-                    set yield = -75000
-                    where game.name = %s and player_runway.id = 1
-                           """, (player,))
-
-            otsikko = eventti[0][1]
-            selite = eventti[0][2]
-
-            # printataan pelaajalle mitä tapahtui
-            return 1, otsikko, selite
-
-
-        elif luku == 2:
-
-            # haetaan kiitoradan status ja yieldi
-
-            cursor.execute("""
-                           select status, yield
-                           from player_runway
-                                    inner join player_airports
-                                               on player_runway.player_airports_id = player_airports.id
-                                    inner join game on player_airports.game_id = game.id
-                           where game.name = %s limit 1
-                           """, (player,))
-            result = cursor.fetchone()
-            if result is None:
-                return  0 # pelaajalla ei ole yhtäkään kiitorataa
-
-            status = result[0]
-            if status == "under_construction":
-                cursor.close()
-                return  0 # ei voi olla turistirysää jos ei ole kiitorata valmis
-
-            org_yield = result[1]
-
-            # talletetaan alkuperäinen yieldi sekä event_id tietokantaan
-            cursor.execute("""
-                           insert into player_events(game_id, original_yield, event_types_id)
-                           values ((select id from game where game.name = %s), %s, %s)
-                           """, (player, org_yield, 1))
-
-
-            # lisätään tietokantaan eventin pituus
-
-            cursor.execute("""
-                           update player_events inner join game on game_id = game.id
-                           set event_weeks_left = 3
-                           where game.name = %s
-                               limit 1
-                           """, (player,))
-
-
-
-            # efekti: tuplataan pelaajan ensimmäisen lentokentän yieldi
-
-            cursor.execute("""
-                           update player_airports
-                           inner join game on player_airports.game_id = game.id
-                           set yield = yield * 2
-                           where game.name = %s
-                            limit 1
-                           """, (player,))
-
-            otsikko = eventti[1][1]
-            selite = eventti[1][2]
-
-            # printataan pelaajalle mitä tapahtui
-            return 2, otsikko, selite
-
-
-
-        elif luku == 3:
-
-            # haetaan pelaajan ensimmäisen kiitoradan status ja yieldi
-
-            cursor.execute("""
-                           select status, yield
-                           from player_runway
-                                    inner join player_airports
-                                               on player_runway.player_airports_id = player_airports.id
-                                    inner join game on player_airports.game_id = game.id
-                           where game.name = %s
-                           limit 1
-                           """, (player,))
-            result = cursor.fetchone()
-            if result is None:
-                return 0 # pelaajalla ei ole yhtäkään kiitorataa
-
-            status = result[0]
-            if status == "under_construction":
-                cursor.close()
-                return 0 # ei vaikuta kiitorataan joka ei ole vielä valmis
-
-            org_yield = result[1]
-
-            # talletetaan alkuperäinen yieldi sekä event_id tietokantaan
-            cursor.execute("""
-                           insert into player_events(game_id, original_yield, event_types_id)
-                           values ((select id from game where game.name = %s), %s, %s)
-                           """, (player, org_yield, 2))
-
-
-            # lisätään tietokantaan eventin pituus
-
-            cursor.execute("""
-                           update player_events inner join game on game_id = game.id
-                           set event_weeks_left = 2
-                           where game.name = %s
-                               limit 1
-                           """, (player,))
-
-
-            # sitten efekti
-
-            cursor.execute("""
-                update player_runway inner join player_airports on player_airports_id = player_airports.id 
-                inner join game on player_airports.game_id = game.id 
-                set yield = 0
-                where game.name = %s
-                            """, (player,))
-
-            otsikko = eventti[2][1]
-            selite = eventti[2][2]
-
-            # printataan pelaajalle mitä tapahtui
-            return 3, otsikko, selite
-
-
-
-        elif luku == 4:
-
-            # haetaan pelaajan ensimmäisen terminaalin status ja yieldi
-
-            cursor.execute("""
-                           select status, yield
-                           from player_terminal
-                                    inner join player_airports
-                                               on player_terminal.player_airports_id = player_airports.id
-                                    inner join game on player_airports.game_id = game.id
-                           where game.name = %s
-                           limit 1
-                           """, (player,))
-            result = cursor.fetchone()
-            if result is None:
-                return 0 # pelaajalla ei ole yhtäkään terminaalia
-
-            status = result[0]
-            if status == "under_construction":
-                cursor.close()
-                return 0 # ei vaikuta terminaaliin joka ei ole vielä valmis
-
-            org_yield = result[1]
-
-            # talletetaan alkuperäinen yieldi sekä event_id tietokantaan
-            cursor.execute("""
-                           insert into player_events(game_id, original_yield, event_types_id)
-                           values ((select id from game where game.name = %s), %s, %s)
-                           """, (player, org_yield, 3))
-
-
-            # lisätään tietokantaan eventin pituus 4 viikkoa
-
-            cursor.execute("""
-                           update player_events inner join game on game_id = game.id
-                           set event_weeks_left = 4
-                           where game.name = %s
-                               limit 1
-                           """, (player,))
-
-
-
-            # efekti
-
-            cursor.execute("""
-                           update player_terminal inner join player_airports on player_airports_id = player_airports.id 
-                            inner join game on player_airports.game_id = game.id 
-                            set yield = %s / 2
-                            where game.name = %s
-                            """, (org_yield, player,))
-
-            otsikko = eventti[3][1]
-            selite = eventti[3][2]
-
-            # printataan pelaajalle mitä tapahtui
-            return 4, otsikko, selite
-
-
-
-        elif luku == 5:
-
-            # haetaan pelaajan ensimmäisen kiitoradan status
-
-            cursor.execute("""
-                           select status
-                           from player_runway
-                                    inner join player_airports
-                                               on player_runway.player_airports_id = player_airports.id
-                                    inner join game on player_airports.game_id = game.id
-                           where game.name = %s
-                               limit 1
-                           """, (player,))
-            result = cursor.fetchone()
-            if result is None:
-                return 0 # pelaajalla ei ole yhtäkään kiitorataa
-
-            status = result[0]
-            if status == "under_construction":
-                cursor.close()
-                return 0 # ei voi laskeutua kiitoradalle, joka ei ole vielä valmis
-
-
-            cursor.execute("update game set money = money + 1000000 where name = %s",(player,))
-            connect.commit()
-
-            otsikko = eventti[4][1]
-            selite = eventti[4][2]
-
-            # printataan pelaajalle mitä tapahtui
-            return 5, otsikko, selite
+    event_map = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4}
+    event_id = event_map.get(luku)
+
+
+    if event_id in [0, 1, 2, 4]:
+        cursor.execute("""
+                       SELECT COUNT(*)
+                       FROM player_runway pr
+                                JOIN player_airports pa ON pr.player_airports_id = pa.id
+                                JOIN game g ON pa.game_id = g.id
+                       WHERE g.name = %s
+                         AND pr.status = 'operational'
+                       """, (player,))
+
+        runway_count = cursor.fetchone()[0]
+
+        if runway_count == 0:
+            return 0
+
+    elif event_id == 3:
+        cursor.execute("""
+                       SELECT COUNT(*)
+                       FROM player_terminal pt
+                                JOIN player_airports pa ON pt.player_airports_id = pa.id
+                                JOIN game g ON pa.game_id = g.id
+                       WHERE g.name = %s
+                         AND pt.status = 'operational'
+                       """, (player,))
+
+        terminal_count = cursor.fetchone()[0]
+
+        if terminal_count == 0:
+            return 0
+
+
+    cursor.execute("SELECT * FROM event_types WHERE id = %s", (event_id,))
+    event_data = cursor.fetchone()
+
+    if not event_data:
+        return 0
+
+    otsikko = event_data[1]
+    selite = event_data[2]
+
+    if event_id == 4:
+        cursor.execute("UPDATE game SET money = money + 1000000 WHERE name = %s", (player,))
+        connect.commit()
+        return 5, otsikko, selite
+
+    duration = 0
+    if event_id == 0:
+        duration = 8
+    elif event_id == 1:
+        duration = 3
+    elif event_id == 2:
+        duration = 2
+    elif event_id == 3:
+        duration = 4
+
+    cursor.execute("""
+                   INSERT INTO player_events (game_id, event_types_id, event_weeks_left, original_yield)
+                   VALUES ((SELECT id FROM game WHERE name = %s), %s, %s, 0)
+                   """, (player, event_id, duration))
 
     connect.commit()
-    cursor.close()
+
+    return luku, otsikko, selite

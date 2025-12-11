@@ -111,7 +111,6 @@ def game_loop():
             constructions(connect)
             add_yield(connect, player_name)
             check_running_event(connect, player_name)
-            check_new_event(connect, player_name)
 
             connect.close()
 
@@ -161,10 +160,10 @@ def resume():
 def set_speed(mode):
     global TICK_TIME
 
-    if mode == "slow":
-        TICK_TIME = 2.0
+    if mode == "fast":
+        TICK_TIME = 1.0
     else:
-        TICK_TIME = 1 / TICK_RATE
+        TICK_TIME = 10.0
 
     return jsonify({"speed": TICK_TIME})
 
@@ -207,14 +206,14 @@ def afford_airports(player):
         connect.close()
         return jsonify([])
 
-    elif balance < 6_000_000:
+    elif balance < 8_000_000:
         cursor.execute("select * from airport where type = 'small_airport'")
         airports = cursor.fetchall()
         cursor.close()
         connect.close()
         return jsonify(airports)
 
-    elif balance < 12_000_000:
+    elif balance < 15_000_000:
         cursor.execute("select * from airport where type in ('medium_airport', 'small_airport')")
         airports = cursor.fetchall()
         cursor.close()
