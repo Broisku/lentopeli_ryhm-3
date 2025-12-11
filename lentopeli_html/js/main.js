@@ -6,6 +6,211 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
+
+
+// pause nappi
+
+let slowMode = false;
+
+let isPaused = false;
+const pauseBtn = document.getElementById('pause');
+
+pauseBtn.addEventListener('click', async () => {
+  // pause
+  if (!isPaused) {
+    await fetch('http://localhost:5000/pause', {method: 'POST'});
+
+    pauseBtn.classList.remove('pause');
+    pauseBtn.classList.add('play');
+    isPaused = true;
+
+  } else {
+    // resume
+    await fetch('http://localhost:5000/resume', {method: 'POST'});
+
+    pauseBtn.classList.remove('play');
+    pauseBtn.classList.add('pause');
+
+    isPaused = false;
+  }
+});
+
+pauseBtn.classList.add('pause');
+
+
+
+function getCountryName(isoCode) {
+  try {
+    const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
+    return regionNames.of(isoCode);
+  } catch (e) {
+    return isoCode;
+  }
+}
+
+function getAirportRules(type) {
+  if (type === 'small_airport') {
+    return {
+      name: 'Small Airport',
+      price: 3_000_000,
+      maxRun: 2, runCost: 1_500_000,
+      maxTerm: 1, termCost: 1_500_000,
+      conTime: "12 weeks"
+    };
+  } else if (type === 'medium_airport') {
+    return {
+      name: 'Medium Airport',
+      price: 8_000_000,
+      maxRun: 3, runCost: 3_000_000,
+      maxTerm: 2, termCost: 6_000_000,
+      conTime: "12 weeks"
+    };
+  } else {
+
+    return {
+      name: 'Large Airport',
+      price: 15_000_000,
+      maxRun: 4, runCost: 4_500_000,
+      maxTerm: 3, termCost: 12_000_000,
+      conTime: "12 weeks"
+    };
+  }
+}
+
+
+
+
+
+let isFastMode = false;
+
+const speedBtn = document.getElementById('speed');
+
+
+speedBtn.classList.add('slow');
+speedBtn.classList.remove('normal');
+
+speedBtn.addEventListener('click', () => {
+
+  isFastMode = !isFastMode;
+
+  if (isFastMode) {
+
+    speedBtn.classList.remove('slow');
+    speedBtn.classList.add('normal');
+
+
+    fetch('http://localhost:5000/set_speed/fast');
+
+  } else {
+
+    speedBtn.classList.remove('normal');
+    speedBtn.classList.add('slow');
+
+
+    fetch('http://localhost:5000/set_speed/slow');
+  }
+
+
+  startPolling();
+});
+
+
+
+
+let constructionState = {};
+
+
+async function checkConstructions() {
+  try {
+    const response = await fetch(`http://localhost:5000/airports/owned/${player}`);
+    const airports = await response.json();
+
+    let needsRefresh = false;
+
+    airports.forEach(airport => {
+
+
+      const name = airport[1];
+      const icao = airport[3];
+      const runStatus = airport[11];
+      const termStatus = airport[14];
+
+      if (constructionState[icao]) {
+
+        if (constructionState[icao].run === 1 && runStatus === 0) {
+          alert(`CONSTRUCTION FINISHED: \nRunway at ${name} is now operational!`);
+          needsRefresh = true;
+        }
+
+        if (constructionState[icao].term === 1 && termStatus === 0) {
+          alert(`CONSTRUCTION FINISHED: \nTerminal at ${name} is now operational!`);
+          needsRefresh = true;
+        }
+      }
+
+      constructionState[icao] = { run: runStatus, term: termStatus };
+    });
+
+    if (needsRefresh && showingOwned) {
+
+      fetchOwned(`http://localhost:5000/airports/owned/${player}`);
+    }
+
+  } catch (error) {
+    console.error("Construction Check Error:", error);
+  }
+}
+
+
+
+
+let pollTimeoutId = null;
+let isFetching = false;
+
+async function gameLoop() {
+
+  if (isPaused) {
+    pollTimeoutId = setTimeout(gameLoop, 1000);
+    return;
+  }
+
+  isFetching = true;
+
+  try {
+    await updateStats();
+
+    await checkConstructions();
+
+    if (typeof checkRunningEvent === "function") {
+      await checkRunningEvent();
+    }
+
+    if (typeof checkNewEvent === "function" && !document.querySelector("dialog")) {
+      await checkNewEvent();
+    }
+
+  } catch (error) {
+    console.error("Game Loop Error:", error);
+  } finally {
+    isFetching = false;
+  }
+
+
+  const delay = slowMode ? 1000 : 1000;
+  pollTimeoutId = setTimeout(gameLoop, delay);
+}
+
+function startPolling() {
+
+  if (!isFetching) {
+    if (pollTimeoutId) clearTimeout(pollTimeoutId);
+    gameLoop();
+  }
+}
+
+
+
+
 const allAirportsLayer = L.layerGroup().addTo(map);
 
 // haetaan lentokentät python apista
@@ -68,8 +273,7 @@ const ownedLayer = L.layerGroup();
 
 let showingOwned = false;
 
-let isPaused = false;
-const pauseBtn = document.getElementById('pause');
+
 
 
 const toggle1 = document.getElementById('toggle1');
@@ -78,203 +282,182 @@ const player = getPlayerName();
 
 document.getElementById('player_name').textContent = player;
 
-toggle1.addEventListener('click', () => {
-
-  if (!showingOwned) {
-    if (map.hasLayer(allAirportsLayer)) map.removeLayer(allAirportsLayer);
-    ownedLayer.clearLayers();
-
-    const ownedUrl = `http://localhost:5000/airports/owned/${player}`;
-
-    function fetchOwned(url) {
-      fetch(url).
-          then(res => res.json()).
-          then(airports => {
-
-            airports.forEach(airport => {
-              const type = airport[0];
-              const name = airport[1];
-              const icao = airport[3];
-              const iata = airport[4];
-              const lat = parseFloat(airport[6]);
-              const lon = parseFloat(airport[7]);
-              const profit = parseFloat(airport[8]);
-              const country = airport[9];
-              const runways = airport[10];
-              const runway_construction = airport[11];
-              const runway_state = airport[12];
-              const terminals = airport[13];
-              const terminals_construction = airport[14];
-              const terminals_state = airport[15];
-
-              let size;
-              if (type === 'small_airport') size = 'small airport';
-              else if (type === 'medium_airport') size = 'medium airport';
-              else size = 'large airport';
-
-              let maxRunways, maxTerminals;
-              let con_time, cost;
-              if (type === 'small_airport') {
-                maxRunways = 2;
-                maxTerminals = 1;
-                con_time = "<b>Construction time:</b> 12 weeks";
-                cost = "<b>Cost:</b> 3,000,000";
-              } else if (type === 'medium_airport') {
-                maxRunways = 3;
-                maxTerminals = 2;
-                con_time = "<b>Construction time:</b> 12 weeks";
-                cost = "<b>Cost:</b> 6,000,000";
-              } else {
-                maxRunways = 4;
-                maxTerminals = 3;
-                con_time = "<br>Construction time:</br> 12 weeks";
-                cost = "<b>Cost:</b> 9,000,000";
-              }
-
-              const ownedRunways = runways || 0;
-              const ownedTerminals = terminals || 0;
-
-              const runwayBtnLabel = ownedRunways < maxRunways ?
-                  'Buy' :
-                  'Owned';
-              const runwayBtnClass = ownedRunways < maxRunways ?
-                  '' :
-                  'disabled';
-
-              const termBtnLabel = ownedTerminals < maxTerminals ?
-                  'Buy' :
-                  'Owned';
-              const termBtnClass = ownedTerminals < maxTerminals ?
-                  '' :
-                  'disabled';
 
 
-              if (!isNaN(lat) && !isNaN(lon)) {
+function updateButtonStyles() {
+  toggle1.style.backgroundColor = showingOwned ? 'gold' : '';
+  toggle2.style.backgroundColor = showingAffordable ? 'gold' : '';
+}
 
-                const marker = L.marker([lat, lon]);
 
-                marker.bindPopup(`
-              <div class="airport-popup">
-                <div class="popup-left">
-                  <h3>${name}, ${country}</h3>
-                  <p><b>Size:</b> ${size}</p>
-                  <p><b>Terminals:</b> <span id="owned-terminals">${ownedTerminals}</span> / ${maxTerminals}
-                    <span id="ter-con-time">${con_time}</span><br>
-                    <span id="ter-cost">${cost}</span><br>
-                    <button class="terminalBtn ${termBtnClass}"><span id="terBtnLabel">${termBtnLabel}</span></button>
-                  </p>
+
+
+
+function fetchOwned(url) {
+  ownedLayer.clearLayers();
+  fetch(url)
+  .then(res => res.json())
+  .then(airports => {
+    airports.forEach(airport => {
+
+      const [typeRaw, name, , icao, iata, , lat, lon, profit, isoCountry,
+        ownedRun, isRunBuilding, , ownedTerm, isTermBuilding] = airport;
+
+      const rules = getAirportRules(typeRaw);
+      const countryName = getCountryName(isoCountry);
+
+      const isRunMaxed = (ownedRun || 0) >= rules.maxRun;
+      const isTermMaxed = (ownedTerm || 0) >= rules.maxTerm;
+
+      let runBtnText = "Buy Runway";
+      let runBtnClass = "";
+      let runDisabled = false;
+      let runStatusHTML = "";
+
+      if (isRunBuilding === 1) {
+        runBtnText = "Constructing...";
+        runBtnClass = "disabled";
+        runDisabled = true;
+        runStatusHTML = `<div class="construction-status">Construction in progress...</div>`;
+      } else if (isRunMaxed) {
+        runBtnText = "Max Reached";
+        runBtnClass = "disabled";
+        runDisabled = true;
+      }
+
+      let termBtnText = "Buy Terminal";
+      let termBtnClass = "";
+      let termDisabled = false;
+      let termStatusHTML = "";
+
+      if (isTermBuilding === 1) {
+        termBtnText = "Constructing...";
+        termBtnClass = "disabled";
+        termDisabled = true;
+        termStatusHTML = `<div class="construction-status">Construction in progress...</div>`;
+      } else if (isTermMaxed) {
+        termBtnText = "Max Reached";
+        termBtnClass = "disabled";
+        termDisabled = true;
+      }
+
+      if (!isNaN(lat) && !isNaN(lon)) {
+        const marker = L.marker([lat, lon]);
+
+        marker.bindPopup(`
+            <div class="airport-popup-grid">
+              
+              <div class="popup-header">
+                <div class="header-left">
+                  <h3>${name}</h3>
+                  <div class="country-name">${countryName}</div>
                 </div>
-
-                <div class="popup-right">
-                  <p><b>${iata || 'N/A'} / ${icao || 'N/A'}</b></p>
-                  <p><b>Profit:</b> ${profit || 0}</p>
-                  <p><b>Runways:</b> <span id="owned-runways">${ownedRunways}</span> / ${maxRunways}
-                    <span id="run-con-time">${con_time}</span><br>
-                    <span id="run-cost">${cost}</span><br>
-                    <button class="runwayBtn ${runwayBtnClass}"><span id="runBtnLabel">${runwayBtnLabel}</span></button>
+                <div class="header-right">
+                  <p><b>${iata || '-'} / ${icao || '-'}</b></p>
+                  <p>${rules.name}</p>
+                  <p class="${profit >= 0 ? 'profit-positive' : 'profit-negative'}">
+                    ${Number(profit).toLocaleString()} €
                   </p>
                 </div>
               </div>
-            `, {maxWidth: 800});
 
-                marker.on('popupopen', (e) => {
+              <div class="popup-body">
+                
+                <div class="body-col">
+                  <div class="section-title">Terminals</div>
+                  <div class="stat-row">Owned: <b>${ownedTerm || 0} / ${rules.maxTerm}</b></div>
+                  <div class="stat-row">Cost: ${Number(rules.termCost).toLocaleString()} €</div>
+                  <div class="stat-row">Time: ${rules.conTime}</div>
+                  ${termStatusHTML}
+                  <button class="action-btn terminalBtn ${termBtnClass}">${termBtnText}</button>
+                </div>
 
-                  const popupEl = e.popup.getElement();
-                  const runBtn = popupEl.querySelector('.runwayBtn');
-                  const termBtn = popupEl.querySelector('.terminalBtn');
+                <div class="body-col">
+                  <div class="section-title">Runways</div>
+                  <div class="stat-row">Owned: <b>${ownedRun || 0} / ${rules.maxRun}</b></div>
+                  <div class="stat-row">Cost: ${Number(rules.runCost).toLocaleString()} €</div>
+                  <div class="stat-row">Time: ${rules.conTime}</div>
+                  ${runStatusHTML}
+                  <button class="action-btn runwayBtn ${runBtnClass}">${runBtnText}</button>
+                </div>
 
-                  if (ownedRunways === maxRunways) {
-                    popupEl.querySelector('#run-con-time').remove();
-                    popupEl.querySelector('#run-cost').remove();
-                  }
-                  if (ownedTerminals === maxTerminals) {
-                    popupEl.querySelector('#ter-con-time').remove();
-                    popupEl.querySelector('#ter-cost').remove();
-                  }
+              </div>
+            </div>
+          `);
 
-                  if (runBtn && !runBtn.classList.contains('disabled')) {
-                    runBtn.addEventListener('click', async () => {
-                      if (!runBtn.classList.contains('disabled')) {
-                        fetch(
-                            `http://localhost:5000/buyrunway/${player}/${icao}`).
-                            then(res => res.json()).then(result => {
-                          if (result.purchased !==
-                              'You don\'t have enough money!') {
-                            const ownedRun = popupEl.querySelector(
-                                '#owned-runways');
-                            const currentRun = parseInt(ownedRun.textContent);
-                            if (currentRun < maxRunways) {
-                              ownedRun.textContent = `${currentRun + 1}`;
-                            }
-                            if (parseInt(ownedRun.textContent) === maxRunways) {
-                              runBtn.querySelector(
-                                  '#runBtnLabel').textContent = 'Owned';
-                              popupEl.querySelector('#run-con-time').remove();
-                              popupEl.querySelector('#run-cost').remove();
-                              runBtn.classList.add('disabled');
-                            }
-                          } else {
-                            alert(result.purchased);
-                          }
-                        });
-                      }
+        marker.on('popupopen', (e) => {
+          const popupEl = e.popup.getElement();
+          const runBtn = popupEl.querySelector('.runwayBtn');
+          const termBtn = popupEl.querySelector('.terminalBtn');
 
-                    });
-                  }
-
-                  if (termBtn && !termBtn.classList.contains('disabled')) {
-                    termBtn.addEventListener('click', async () => {
-                      if (!termBtn.classList.contains('disabled')) {
-                        fetch(
-                            `http://localhost:5000/buyterminal/${player}/${icao}`).
-                            then(res => res.json()).then(result => {
-                          if (result.purchased !==
-                              'You don\'t have enough money!') {
-                            const ownedTer = popupEl.querySelector('#owned-terminals');
-                            const currentTer = parseInt(ownedTer.textContent);
-                            if (currentTer < maxTerminals) {
-                              ownedTer.textContent = `${currentTer + 1}`;
-                            }
-                            if (parseInt(ownedTer.textContent) === maxTerminals) {
-                              termBtn.querySelector(
-                                  '#terBtnLabel').textContent = 'Owned';
-                              popupEl.querySelector('#ter-con-time').remove();
-                              popupEl.querySelector('#ter-cost').remove();
-                              termBtn.classList.add('disabled');
-                            }
-                          } else {
-                            alert(result.purchased);
-                          }
-                        });
-                      }
-                    });
-                  }
-                });
-
-                marker.on('popupclose', (e) => {
-                  ownedLayer.clearLayers();
-                  fetchOwned(ownedUrl);
-                });
-
-                ownedLayer.addLayer(marker);
-              }
+          if (runBtn && !runDisabled) {
+            runBtn.addEventListener('click', () => {
+              fetch(`http://localhost:5000/buyrunway/${player}/${icao}`)
+              .then(res => res.json())
+              .then(result => {
+                if(result.purchased.includes("enough")) { alert(result.purchased); return; }
+                alert("Runway construction started!");
+                marker.closePopup();
+                fetchOwned(url);
+              });
             });
+          }
 
-            if (!map.hasLayer(ownedLayer)) map.addLayer(ownedLayer);
-            showingOwned = true;
+          if (termBtn && !termDisabled) {
+            termBtn.addEventListener('click', () => {
+              fetch(`http://localhost:5000/buyterminal/${player}/${icao}`)
+              .then(res => res.json())
+              .then(result => {
+                if(result.purchased.includes("enough")) { alert(result.purchased); return; }
+                alert("Terminal construction started!");
+                marker.closePopup();
+                fetchOwned(url);
+              });
+            });
+          }
+        });
 
-          }).
-          catch(err => console.error(err));
+        ownedLayer.addLayer(marker);
+      }
+    });
+    if (!map.hasLayer(ownedLayer)) map.addLayer(ownedLayer);
+    showingOwned = true;
+  })
+  .catch(err => console.error(err));
+}
 
-    }
 
-    fetchOwned(ownedUrl);
+
+toggle1.addEventListener('click', () => {
+
+  if (map.hasLayer(allAirportsLayer)) map.removeLayer(allAirportsLayer);
+
+
+  ownedLayer.clearLayers();
+  affordableLayer.clearLayers();
+
+  if (map.hasLayer(affordableLayer)) map.removeLayer(affordableLayer);
+
+  if (!showingOwned) {
+
+    showingOwned = true;
+    showingAffordable = false;
+
+
+    fetchOwned(`http://localhost:5000/airports/owned/${player}`);
+
   } else {
-    ownedLayer.clearLayers();
-    if (!map.hasLayer(allAirportsLayer)) map.addLayer(allAirportsLayer);
+
     showingOwned = false;
+
+
+    if (!map.hasLayer(allAirportsLayer)) map.addLayer(allAirportsLayer);
   }
+
+  updateButtonStyles();
 });
+
+
 
 
 // nappi 2:
@@ -285,68 +468,105 @@ let showingAffordable = false;
 
 const toggle2 = document.getElementById('toggle2');
 
+
+
 toggle2.addEventListener('click', () => {
+  if (map.hasLayer(allAirportsLayer)) map.removeLayer(allAirportsLayer);
+  ownedLayer.clearLayers();
+  affordableLayer.clearLayers();
 
   if (!showingAffordable) {
-    if (map.hasLayer(allAirportsLayer)) map.removeLayer(allAirportsLayer);
-    if (map.hasLayer(ownedLayer)) map.removeLayer(ownedLayer);
-    affordableLayer.clearLayers();
+    fetch(`http://localhost:5000/airports/afford/${player}`)
+    .then(res => res.json())
+    .then(airports => {
+      airports.forEach(airport => {
 
-    fetch(`http://localhost:5000/airports/afford/${player}`).
-        then(res => res.json()).
-        then(airports => {
-          airports.forEach(airport => {
-            const name = airport[3];
-            const type = airport[2];
-            const lat = parseFloat(airport[4]);
-            const lon = parseFloat(airport[5]);
-            const country = airport[8];
-            const municipality = airport[10];
-            const iata = airport[12];
-            const icao = airport[11];
+        const typeRaw = airport[2];
+        const name = airport[3];
+        const lat = parseFloat(airport[4]);
+        const lon = parseFloat(airport[5]);
+        const isoCountry = airport[8];
+        const icao = airport[11];
+        const iata = airport[12];
 
-            if (!isNaN(lat) && !isNaN(lon)) {
+        const rules = getAirportRules(typeRaw);
+        const countryName = getCountryName(isoCountry);
 
-              const marker = L.marker([lat, lon]);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          const marker = L.marker([lat, lon]);
 
-              marker.bindPopup(`
-            <b>${name}</b><br>
-            Type: ${type}<br>
-            City: ${municipality}<br>
-            Country: ${country}<br>
-            IATA: ${iata || 'N/A'}<br>
-            ICAO: ${icao || 'N/A'}<br>
-            Lat: ${lat}<br>
-            Lon: ${lon}
-            
-            <button class="buyBtn">Buy</button>
-          `);
-              marker.on('popupopen', (e) => {
-                const buyBtn = e.popup.getElement().querySelector('.buyBtn');
-                if (buyBtn) {
-                  buyBtn.addEventListener('click', () => {
-                    alert(`Airport purchased: ${name}`);
-                    fetch(
-                        `http://localhost:5000/buyairports/${player}/${icao}`).
-                        then(res => res.json()).then(data => console.log(data));
-                  }, {once: true});
-                }
-              });
-              affordableLayer.addLayer(marker);
+
+          marker.bindPopup(`
+                <div class="airport-popup-grid">
+                  <div class="popup-header">
+                    <div class="header-left">
+                      <h3>${name}</h3>
+                      <div class="country-name">${countryName}</div>
+                    </div>
+                    <div class="header-right">
+                      <p><b>${iata || '-'} / ${icao || '-'}</b></p>
+                      <p>${rules.name}</p>
+                      <p>Price: <b>${Number(rules.price).toLocaleString()} €</b></p>
+                    </div>
+                  </div>
+
+                  <div class="popup-body">
+                    
+                    <div class="body-col">
+                      <div class="section-title">Potential Terminals</div>
+                      <div class="stat-row">Max Capacity: <b>${rules.maxTerm}</b></div>
+                      <div class="stat-row">Cost per unit: ${Number(rules.termCost).toLocaleString()} €</div>
+                    </div>
+
+                    <div class="body-col">
+                      <div class="section-title">Potential Runways</div>
+                      <div class="stat-row">Max Capacity: <b>${rules.maxRun}</b></div>
+                      <div class="stat-row">Cost per unit: ${Number(rules.runCost).toLocaleString()} €</div>
+                    </div>
+
+                  </div>
+                  <button class="action-btn buyAirportBtn" style="margin: 0 20px 20px 20px; width: auto;">
+                    Buy Airport (${Number(rules.price).toLocaleString()} €)
+                  </button>
+                </div>
+              `);
+
+          marker.on('popupopen', (e) => {
+            const buyBtn = e.popup.getElement().querySelector('.buyAirportBtn');
+            if (buyBtn) {
+              buyBtn.addEventListener('click', async () => {
+
+                await fetch(`http://localhost:5000/buyairports/${player}/${icao}`);
+                alert(`Airport purchased: ${name}`);
+
+
+                affordableLayer.removeLayer(marker);
+                ownedLayer.clearLayers();
+                showingOwned = false;
+              }, { once: true });
             }
           });
 
-          if (!map.hasLayer(affordableLayer)) map.addLayer(affordableLayer);
-          showingAffordable = true;
-        }).
-        catch(err => console.error(err));
+          affordableLayer.addLayer(marker);
+        }
+      });
+
+      if (!map.hasLayer(affordableLayer)) map.addLayer(affordableLayer);
+      showingAffordable = true;
+      showingOwned = false;
+      updateButtonStyles();
+    })
+    .catch(err => console.error(err));
 
   } else {
-    affordableLayer.clearLayers();
-    if (!map.hasLayer(allAirportsLayer)) map.addLayer(allAirportsLayer);
     showingAffordable = false;
+    if (!map.hasLayer(allAirportsLayer)) map.addLayer(allAirportsLayer);
+    updateButtonStyles();
   }
 });
+
+
+
 
 const moneyEl = document.getElementById('money');
 const profitEl = document.getElementById('profit');
@@ -367,66 +587,4 @@ async function updateStats() {
 }
 
 
-setInterval(updateStats, 1000);
-
-// pause nappi
-
-pauseBtn.addEventListener('click', async () => {
-  // pause
-  if (!isPaused) {
-    await fetch('http://localhost:5000/pause', {method: 'POST'});
-
-    pauseBtn.classList.remove('pause');
-    pauseBtn.classList.add('play');
-    isPaused = true;
-
-  } else {
-    // resume
-    await fetch('http://localhost:5000/resume', {method: 'POST'});
-
-    pauseBtn.classList.remove('play');
-    pauseBtn.classList.add('pause');
-
-    isPaused = false;
-  }
-});
-
-pauseBtn.classList.add('pause');
-
-//nopeus nappi
-
-const speedBtn = document.getElementById('speed');
-let slowMode = false;
-
-speedBtn.addEventListener('click', () => {
-  slowMode = !slowMode;
-
-  if (slowMode) {
-    // nopeampi
-    speedBtn.classList.remove('normal');
-    speedBtn.classList.add('slow');
-
-    fetch('http://localhost:5000/set_speed/slow');
-  } else {
-    // vaihtaa takaisin normaaliin nopeuteen
-    speedBtn.classList.remove('slow');
-    speedBtn.classList.add('normal');
-
-    fetch('http://localhost:5000/set_speed/normal');
-  }
-
-});
-
-async function tickPoll() {
-  if (!isPaused) {
-    await checkRunningEvent();
-    await checkNewEvent();
-  }
-}
-
-if (slowMode) {
-  setInterval(tickPoll, 10000);
-}
-else {
-  setInterval(tickPoll, 3000);
-}
+startPolling();

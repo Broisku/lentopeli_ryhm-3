@@ -95,9 +95,10 @@ li a:hover {
     background-color: blanchedalmond;
 }
 #submit {
+    font-size: 20px;
     background-color: blanchedalmond;
-    width: 8rem;
-    height: 2.5rem;
+    width: 10rem;
+    height: 3rem;
     margin: 1rem auto;
     cursor: pointer;
 
@@ -129,4 +130,12 @@ li a:hover {
     background-color: blanchedalmond;
     padding: 1rem;
     outline: black solid 2px;
+}
+
+#new-player {
+    height: 1.5rem;
+}
+
+#label {
+    font-size: 20px;
 }

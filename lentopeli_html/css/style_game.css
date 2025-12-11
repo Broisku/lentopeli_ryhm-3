@@ -110,7 +110,7 @@ body {
     background-color: #d0dbdf;
 }
 
-#speed.normal::before {
+#speed.slow::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -123,8 +123,8 @@ body {
 }
 
 
-#speed.slow::before,
-#speed.slow::after {
+#speed.normal::before,
+#speed.normal::after {
     content: "";
     position: absolute;
     top: 30%;
@@ -134,11 +134,11 @@ body {
     border-radius: 50%;
 }
 
-#speed.slow::before {
+#speed.normal::before {
     left: 55%;
 }
 
-#speed.slow::after {
+#speed.normal::after {
     right: 55%;
 }
 
@@ -159,79 +159,175 @@ body {
     border-radius: 6px;
 }
 
-.airport-popup {
+
+
+
+.leaflet-popup-content-wrapper {
+    border-radius: 2px !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    width: 450px !important;
+}
+
+
+
+.leaflet-container a.leaflet-popup-close-button {
+    top: 0;
+    right: 0;
+
+
+    padding: 0 !important;
+
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+
+
+    width: 30px;
+    height: 30px;
+
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 0 2px 0 0;
+    transition: background-color 0.2s, color 0.2s;
+    z-index: 1000;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+    background-color: #ff4444;
+    color: white;
+}
+
+
+
+.airport-popup-grid {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+
+.popup-header {
+    background-color: #f0f0f0;
+    padding: 15px 20px;
+    border-bottom: 2px solid #ddd;
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
-    min-width: 280px;
-    font-family: Arial, sans-serif;
+    align-items: flex-start;
 }
 
-.popup-left, .popup-right {
-    width: 50%;
+.header-left {
+    flex: 2;
 }
 
-.popup-left h3 {
-    margin: 0 0 5px 0;
-    font-size: 16px;
+.header-left h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.airport-popup p {
-    margin: 4px 0;
+.header-left .country-name {
     font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+    font-weight: 600;
 }
 
-.airport-popup button {
-    margin-left: 5px;
-    padding: 3px 6px;
-    cursor: pointer;
+.header-right {
+    flex: 1;
+    text-align: right;
     font-size: 12px;
+    color: #555;
+    border-left: 1px solid #ccc;
+    padding-left: 15px;
+    margin-left: 10px;
+    padding-right: 35px;
+}
+
+.header-right p {
+    margin: 2px 0;
+}
+
+.profit-positive { color: green; font-weight: bold; font-size: 14px; }
+.profit-negative { color: red; font-weight: bold; font-size: 14px; }
+
+
+.popup-body {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    background-color: white;
+}
+
+.body-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #888;
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 2px;
+}
+
+.stat-row {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.construction-status {
+    color: #e67e22;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 5px 0;
 }
 
 
-.airport-popup {
-  display: flex;
-  background: #e6e6e6;
-  padding: 12px;
-  border-radius: 8px;
-  gap: 20px;
-  font-family: Arial, sans-serif;
-  width: 320px;
+.action-btn {
+    margin-top: auto;
+    padding: 10px 0;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    width: 100%;
 }
 
-.popup-left, .popup-right {
-  flex: 1;
+.action-btn:hover {
+    background-color: #27ae60;
+    transform: scale(1.02);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.airport-popup h3 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
+.action-btn.disabled {
+    background-color: #bdc3c7;
+    color: #7f8c8d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-.airport-popup p {
-  margin: 4px 0;
-}
-
-.square-btn {
-  display: inline-block;
-  padding: 6px 12px;
-  border: 2px solid #333;
-  border-radius: 4px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 13px;
-  margin-left: 8px;
-}
-
-.square-btn.disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.square-btn.construction {
-  background: #ffe08c;
-  border-color: #c27d00;
-}
 
 dialog {
     display: flex;
